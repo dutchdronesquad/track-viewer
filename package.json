@@ -53,6 +53,7 @@
   "homepage": "https://github.com/dutchdronesquad/track-viewer",
   "bugs": "https://github.com/dutchdronesquad/track-viewer/issues",
   "scripts": {
+    "prepare": "npm run build",
     "build": "tsup && tsc -p tsconfig.build.json && node scripts/build-css.mjs",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "lint": "oxlint .",
