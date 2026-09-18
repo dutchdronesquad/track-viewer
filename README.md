@@ -40,7 +40,7 @@ npm run build
   ```
 - ESM/React consumers use `createTrackDrawViewer` (or the `<TrackViewer/>` component) from `@trackdraw/viewer` directly and are expected to already run Tailwind; they can optionally load the same `trackdraw-viewer.css`.
 
-**Known gap:** the ESM build ships **no `.d.ts` type declarations**. `tsup`'s `dts` option auto-installs a pinned `rollup-plugin-dts` that isn't compatible with this repo's TypeScript 7 (crashes on an internal Compiler API change). Not a blocker today (nothing consumes `dist/` yet), but needs revisiting before any real npm publish — see the comment in `tsup.config.ts`.
+Type declarations (`dist/**/*.d.ts`) are emitted by a separate `tsc -p tsconfig.build.json` pass, not by `tsup`'s own `dts` option — `tsup`'s bundled copy of `rollup-plugin-dts` isn't compatible with this repo's TypeScript 7 (see the comment in `tsup.config.ts`). A plain `tsc --declaration` pass works because this package's `rootDir` no longer reaches outside its own `src/`, now that it's a standalone repository.
 
 **Vendored, not shared, source.** Files under `src/lib/` and `src/components/` originated as copies of pure/leaf logic from the trackdraw app (`src/lib/track/*`, `src/components/canvas/*`, `src/hooks/*`) — not re-exports or a shared module. They will not automatically pick up future changes to trackdraw's originals; keep them in sync manually if the app's copy changes in a way that matters for rendering fidelity. A few app-only exports were intentionally dropped during vendoring (e.g. `design.ts`'s serialize/normalize/create functions, which pulled in map-reference and inventory-planning code this read-only viewer never needs) — see the file-level comments on the trimmed copies.
 

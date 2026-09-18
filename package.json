@@ -13,27 +13,35 @@
   ],
   "exports": {
     ".": {
+      "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     },
     "./mount": {
+      "types": "./dist/mount.d.ts",
       "import": "./dist/mount.js"
     },
     "./snapshot/types": {
+      "types": "./dist/snapshot/types.d.ts",
       "import": "./dist/snapshot/types.js"
     },
     "./snapshot/version": {
+      "types": "./dist/snapshot/version.d.ts",
       "import": "./dist/snapshot/version.js"
     },
     "./snapshot/schema": {
+      "types": "./dist/snapshot/schema.d.ts",
       "import": "./dist/snapshot/schema.js"
     },
     "./assets/manifest": {
+      "types": "./dist/assets/manifest.d.ts",
       "import": "./dist/assets/manifest.js"
     },
     "./assets/texture-paths": {
+      "types": "./dist/assets/texture-paths.d.ts",
       "import": "./dist/assets/texture-paths.js"
     },
     "./assets/asset-url": {
+      "types": "./dist/assets/asset-url.d.ts",
       "import": "./dist/assets/asset-url.js"
     },
     "./static/trackdraw-viewer.css": "./dist/static/trackdraw-viewer.css"
@@ -45,7 +53,7 @@
   "homepage": "https://github.com/dutchdronesquad/track-viewer",
   "bugs": "https://github.com/dutchdronesquad/track-viewer/issues",
   "scripts": {
-    "build": "tsup && node scripts/build-css.mjs",
+    "build": "tsup && tsc -p tsconfig.build.json && node scripts/build-css.mjs",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "lint": "oxlint .",
     "lint:fix": "oxlint --fix .",

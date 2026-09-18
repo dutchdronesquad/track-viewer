@@ -16,19 +16,16 @@ export default defineConfig([
       "assets/asset-url": "src/assets/asset-url.ts",
     },
     format: ["esm"],
-    // dts generation is disabled: tsup auto-installs rollup-plugin-dts on
-    // demand, pinned to a version whose internal TS Compiler API usage is
-    // incompatible with this repo's TypeScript 7 (crashes with
-    // "Cannot read properties of undefined (reading
-    // 'useCaseSensitiveFileNames')" - a rollup-plugin-dts/TS7 compatibility
-    // gap, not a config issue here). No .d.ts files ship in this build; not
-    // a blocker for this issue (no npm publish yet, the app consumes
-    // packages/viewer via the source TS path alias, not dist/), but a real
-    // gap to close before an actual npm publish. Revisit once
-    // rollup-plugin-dts (or tsup's bundled pin of it) supports TS7, or once
-    // the deferred source-vendoring pass makes a plain `tsc --declaration`
-    // emission viable (rootDir today reaches outside packages/viewer/src
-    // into the app, which a non-bundling declaration emitter can't handle).
+    // tsup's own dts option always uses an internal, bundled copy of
+    // rollup-plugin-dts@6.1.1 (compiled directly into tsup/dist/rollup.js -
+    // not resolved from node_modules, so pinning a newer version as a
+    // dependency has no effect). That bundled copy crashes on TypeScript
+    // 7's Compiler API ("Cannot read properties of undefined (reading
+    // 'useCaseSensitiveFileNames')"). Declarations are emitted separately
+    // instead, via a plain `tsc --declaration` pass (see the "build" script
+    // and tsconfig.build.json) - viable now that this package has no
+    // rootDir reach outside its own src/, which was the blocker before the
+    // repo split.
     dts: false,
     sourcemap: true,
     clean: true,
