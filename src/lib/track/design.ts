@@ -1,5 +1,3 @@
-// Apache-2.0. Copyright Dutch Drone Squad. See packages/viewer/LICENSE and NOTICE.md.
-
 // Vendored subset of src/lib/track/design.ts (issue #870) - only the pure
 // shape-reading helpers the viewer package actually needs. The app's own
 // serialize/normalize/create/parse design functions are intentionally NOT

@@ -1,4 +1,3 @@
-// Apache-2.0. Copyright Dutch Drone Squad. See packages/viewer/LICENSE and NOTICE.md.
 //
 // Copy of src/components/canvas/preview3d/items/Flag3D.tsx with the
 // useTexture() call routed through an assetResolver prop so textures

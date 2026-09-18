@@ -1,5 +1,3 @@
-// Apache-2.0. Copyright Dutch Drone Squad. See packages/viewer/LICENSE and NOTICE.md.
-
 /**
  * Portable wire format for a viewer-facing design snapshot. Deliberately has
  * zero dependency on src/lib/types.ts's full TrackDesign/Shape types -

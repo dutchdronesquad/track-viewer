@@ -1,5 +1,3 @@
-// Apache-2.0. Copyright Dutch Drone Squad. See packages/viewer/LICENSE and NOTICE.md.
-
 /**
  * Replaces next-intl in the extracted viewer: a plain, overridable string
  * table instead of a framework-coupled translation hook.

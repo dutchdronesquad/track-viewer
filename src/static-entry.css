@@ -1,18 +1,16 @@
 /*
- * Apache-2.0. Copyright Dutch Drone Squad. See packages/viewer/LICENSE and NOTICE.md.
- *
- * Compiled by scripts/build_viewer_css.mjs (@tailwindcss/cli) into
+ * Compiled by scripts/build-css.mjs (@tailwindcss/cli) into
  * dist/static/trackdraw-viewer.css for the static browser build - a plain
  * <script>-tag host has no Tailwind pipeline of its own, so this file ships
  * both the Tailwind utility classes the viewer's components use and the
  * TrackDraw theme tokens those utilities resolve against (bg-card,
  * border-border, etc. are custom tokens, not stock Tailwind colors).
  *
- * This is a deliberate copy of src/app/globals.css's tokens/base layer, not
- * an import of it - the app's own globals.css also carries app-chrome-only
- * rules (scrollbar styling, brand-utility classes) that are harmless here
- * but not the point. Keep the :root/.dark/@theme inline blocks in sync with
- * src/app/globals.css if the design system's tokens change.
+ * This is a deliberate copy of the trackdraw app's src/app/globals.css
+ * tokens/base layer, not an import of it - the app's own globals.css also
+ * carries app-chrome-only rules (scrollbar styling, brand-utility classes)
+ * that are harmless here but not the point. Keep the :root/.dark/@theme
+ * inline blocks in sync manually if the design system's tokens change.
  */
 @import "tailwindcss";
 @import "tw-animate-css";

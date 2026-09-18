@@ -1,5 +1,3 @@
-// Apache-2.0. Copyright Dutch Drone Squad. See packages/viewer/LICENSE and NOTICE.md.
-
 import { getDesignShapes } from "./lib/track/design";
 import { getDesignPolylineZRange } from "./lib/track/polyline-derived";
 import type { Shape, TrackDesign } from "./types";

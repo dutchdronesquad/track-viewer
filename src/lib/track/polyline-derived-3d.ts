@@ -1,5 +1,3 @@
-// Apache-2.0. Copyright Dutch Drone Squad. See packages/viewer/LICENSE and NOTICE.md.
-
 import * as THREE from "three";
 import { getAdaptiveCurveSegments, smoothPolyline3D } from "./geometry";
 import type { PolylinePoint, PolylineShape } from "../types";

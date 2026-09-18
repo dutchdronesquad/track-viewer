@@ -1,4 +1,3 @@
-// Apache-2.0. Copyright Dutch Drone Squad. See packages/viewer/LICENSE and NOTICE.md.
 //
 // Copy of src/components/canvas/preview3d/shared-scene.tsx with the
 // module-level eager whole-catalog texture preload removed (see

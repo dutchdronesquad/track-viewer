@@ -1,5 +1,3 @@
-// Apache-2.0. Copyright Dutch Drone Squad. See packages/viewer/LICENSE and NOTICE.md.
-
 import type { PolylinePoint, PolylineShape } from "../types";
 
 export function distance2D(

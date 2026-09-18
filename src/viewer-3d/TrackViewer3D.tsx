@@ -1,4 +1,3 @@
-// Apache-2.0. Copyright Dutch Drone Squad. See packages/viewer/LICENSE and NOTICE.md.
 //
 // Extracted from src/components/canvas/viewer/TrackPreview3D.tsx: takes a
 // `design` prop instead of reading the global editor Zustand store, a

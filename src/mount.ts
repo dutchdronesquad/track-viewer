@@ -1,5 +1,3 @@
-// Apache-2.0. Copyright Dutch Drone Squad. See packages/viewer/LICENSE and NOTICE.md.
-
 import { createElement } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { TrackViewer, type TrackViewerProps } from "./TrackViewer";

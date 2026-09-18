@@ -1,5 +1,3 @@
-// Apache-2.0. Copyright Dutch Drone Squad. See packages/viewer/LICENSE and NOTICE.md.
-
 import textureManifest from "./generated/texture-manifest.json";
 import type { ViewerAssetManifestEntry } from "../snapshot/types";
 import type { Shape } from "../types";

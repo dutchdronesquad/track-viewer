@@ -1,5 +1,3 @@
-// Apache-2.0. Copyright Dutch Drone Squad. See packages/viewer/LICENSE and NOTICE.md.
-
 // Trimmed vendored subset of src/lib/canvas/shared.ts (issue #870) - only
 // the RectLike type, which is all field-layer.tsx/shape-bounds.ts need. The
 // app's own file also exports an editor-interaction grab-bag (marquee-select

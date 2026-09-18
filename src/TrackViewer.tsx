@@ -1,4 +1,3 @@
-// Apache-2.0. Copyright Dutch Drone Squad. See packages/viewer/LICENSE and NOTICE.md.
 //
 // Top-level viewer shell: composes TrackViewer2D/TrackViewer3D behind a
 // tab switch, lazy-loads the 3D chunk on demand (first 3D visit, or an

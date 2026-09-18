@@ -1,5 +1,3 @@
-// Apache-2.0. Copyright Dutch Drone Squad. See packages/viewer/LICENSE and NOTICE.md.
-
 import {
   TRACKDRAW_BANNER_ELEMENT_ID,
   TRACKDRAW_CONE_ELEMENT_ID,

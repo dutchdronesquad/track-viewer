@@ -4,8 +4,8 @@ import {
   createCatalogShapeDraft,
   MULTIGP_HURDLE_ELEMENT_ID,
   TRACKDRAW_GATE_ELEMENT_ID,
-} from "@/lib/track/elements/catalog";
-import type { Shape } from "@/lib/types";
+} from "@trackdraw/viewer/lib/track/elements/catalog";
+import type { Shape } from "@trackdraw/viewer/lib/types";
 
 function draftToShape(
   id: string,

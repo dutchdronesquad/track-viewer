@@ -1,4 +1,3 @@
-// Apache-2.0. Copyright Dutch Drone Squad. See packages/viewer/LICENSE and NOTICE.md.
 //
 // Copy of src/components/canvas/preview3d/items/TrackItem3D.tsx threaded
 // with an assetResolver prop, dispatched down to the texture-using leaf
