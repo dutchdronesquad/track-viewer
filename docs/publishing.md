@@ -75,8 +75,12 @@ Once the package exists, open its **Settings → Trusted Publisher** on npm and 
 | Organization or user      | `dutchdronesquad`          |
 | Repository                | `track-viewer`             |
 | Workflow filename         | `publish.yml`              |
-| Environment               | Leave empty                |
+| Environment               | `release`                  |
 | Allowed actions, if shown | Allow direct `npm publish` |
+
+The publish job uses the GitHub Environment **release**. In [repository environment settings](https://github.com/dutchdronesquad/track-viewer/settings/environments), keep an environment with that exact name. Use `release` in npm's trusted-publisher configuration too: leaving it empty or using another name can cause OIDC authentication to fail. Keep **Allow direct publishing** enabled on npm so publishing a GitHub Release publishes directly to the registry.
+
+The environment is created without required reviewers or a wait timer, preserving automatic publication after the GitHub Release is published. Any protection rules added later will apply before the publish job starts. No additional npm login is needed for normal releases.
 
 Save, remove the GitHub `NPM_TOKEN` secret and revoke the temporary token in npm. The next release uses OIDC; the workflow already has `id-token: write`, a GitHub-hosted runner and a compatible npm version. No new secret is needed. Configuration is not proof of a successful OIDC publish: verify the next genuine release's workflow and npm result. No empty test release is necessary.
 
