@@ -116,9 +116,7 @@ export function getTimingMarkerTitle(
 
 export function getDesignTimingMarkers(design: TrackDesign) {
   let splitIndex = 0;
-  const shapes = design.shapeOrder
-    .map((id) => design.shapeById[id])
-    .filter((shape): shape is Shape => Boolean(shape));
+  const shapes = design.shapes;
 
   return shapes.reduce<DesignTimingMarker[]>((markers, shape) => {
     const marker = getShapeTimingMarker(shape);

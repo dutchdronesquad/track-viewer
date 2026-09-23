@@ -14,28 +14,97 @@ const catalogIdentitySchema = z.object({
   }),
 });
 
-// Loosely typed on purpose: per-shape-kind fields (width/height/points/...)
-// are already allowlisted upstream by toViewerShape() in the app; this
-// schema's job is to catch structural corruption/oversized payloads, not to
-// re-derive the ~150-line discriminated Shape union Phase 1 explicitly
-// deferred vendoring on (see packages/viewer/src/types.ts's own comment).
-const viewerShapeSchema = z
-  .object({
-    id: z.string(),
-    kind: z.string(),
-    name: z.string().optional(),
-    x: z.number(),
-    y: z.number(),
-    rotation: z.number(),
-    frontOffsetDeg: z.number().optional(),
-    locked: z.boolean().optional(),
-    color: z.string().optional(),
-    meta: z.object({ catalog: catalogIdentitySchema.optional() }).optional(),
-  })
-  .loose();
+const dimension = z.number().positive().max(100_000);
+const coordinate = z.number().min(-100_000).max(100_000);
+const base = {
+  id: z.string().min(1).max(256),
+  name: z.string().max(1000).optional(),
+  x: coordinate,
+  y: coordinate,
+  rotation: coordinate,
+  frontOffsetDeg: coordinate.optional(),
+  locked: z.boolean().optional(),
+  color: z.string().max(100).optional(),
+  meta: z.object({ catalog: catalogIdentitySchema.optional() }).optional(),
+};
+
+// z.object strips unknown fields at every level, including imported shapes.
+export const viewerShapeSchema = z.discriminatedUnion("kind", [
+  z.object({
+    ...base,
+    kind: z.literal("gate"),
+    width: dimension,
+    height: dimension,
+    thick: dimension.optional(),
+  }),
+  z.object({
+    ...base,
+    kind: z.literal("tower"),
+    width: dimension,
+    height: dimension,
+    levels: z.number().int().min(1).max(100).optional(),
+    elevation: coordinate.optional(),
+    thick: dimension.optional(),
+  }),
+  z.object({
+    ...base,
+    kind: z.literal("flag"),
+    radius: dimension,
+    poleHeight: dimension.optional(),
+  }),
+  z.object({ ...base, kind: z.literal("cone"), radius: dimension }),
+  z.object({
+    ...base,
+    kind: z.literal("label"),
+    text: z.string().max(1000),
+    fontSize: z.number().positive().max(512).optional(),
+    project: z.boolean().optional(),
+  }),
+  z.object({ ...base, kind: z.literal("startfinish"), width: dimension }),
+  z.object({
+    ...base,
+    kind: z.literal("ladder"),
+    width: dimension,
+    height: dimension,
+    rungs: z.number().int().min(1).max(100),
+    elevation: coordinate.optional(),
+  }),
+  z.object({
+    ...base,
+    kind: z.literal("divegate"),
+    width: dimension,
+    height: dimension.optional(),
+    thick: dimension.optional(),
+    tilt: coordinate.optional(),
+    elevation: coordinate.optional(),
+  }),
+  z.object({
+    ...base,
+    kind: z.literal("barrier"),
+    variant: z.enum(["hurdle", "banner", "fence", "net"]),
+    width: dimension,
+    height: dimension,
+  }),
+  z.object({
+    ...base,
+    kind: z.literal("polyline"),
+    points: z
+      .array(
+        z.object({ x: coordinate, y: coordinate, z: coordinate.optional() })
+      )
+      .max(10_000),
+    closed: z.boolean().optional(),
+    strokeWidth: dimension.optional(),
+    showArrows: z.boolean().optional(),
+    arrowSpacing: dimension.optional(),
+    smooth: z.boolean().optional(),
+  }),
+]);
 
 const assetManifestEntrySchema = z.object({
-  path: z.string(),
+  path: z
+    .string()
+    .regex(/^\/assets\/(?:[a-zA-Z0-9_-]+\/)*[a-zA-Z0-9_-]+\.(?:webp|png|svg)$/),
   contentType: z.string(),
   sizeBytes: z.number().int().nonnegative(),
   sha256: z
@@ -49,20 +118,29 @@ export const viewerDesignSnapshotSchema = z.object({
   snapshotId: z.string(),
   requiredViewer: z.object({
     schema: z.literal(VIEWER_SNAPSHOT_SCHEMA),
-    minRendererVersion: z.string(),
+    minRendererVersion: z
+      .string()
+      .regex(/^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/),
     capabilities: z.array(z.string()),
   }),
   design: z.object({
     version: z.literal(2),
     title: z.string(),
     field: z.object({
-      width: z.number().nonnegative(),
-      height: z.number().nonnegative(),
+      width: dimension,
+      height: dimension,
       origin: z.enum(["tl", "bl"]),
-      gridStep: z.number().nonnegative(),
-      ppm: z.number().nonnegative(),
+      gridStep: dimension,
+      ppm: dimension,
     }),
-    shapes: z.array(viewerShapeSchema),
+    shapes: z
+      .array(viewerShapeSchema)
+      .max(5000)
+      .refine(
+        (shapes) =>
+          new Set(shapes.map((shape) => shape.id)).size === shapes.length,
+        "Shape IDs must be unique"
+      ),
     updatedAt: z.string(),
   }),
   assets: z.array(assetManifestEntrySchema),
@@ -117,5 +195,5 @@ export function validateViewerDesignSnapshot(
     );
   }
 
-  return parsed.data as ViewerDesignSnapshot;
+  return parsed.data;
 }

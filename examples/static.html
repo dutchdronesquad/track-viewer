@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Offline course viewer</title>
+    <link rel="stylesheet" href="../dist/static/trackdraw-viewer.css" />
+  </head>
+  <body>
+    <h1>Offline course viewer</h1>
+    <p>
+      Install the static viewer locally, then open a TrackDraw course archive.
+    </p>
+    <label
+      >Course archive <input id="file" type="file" accept=".zip,.tdviewer.zip"
+    /></label>
+    <p id="status" role="status"></p>
+    <div id="viewer" style="height: 70vh; width: 100%"></div>
+    <script src="../dist/static/trackdraw-viewer.global.js"></script>
+    <script>
+      let viewer, assets;
+      document
+        .querySelector("#file")
+        .addEventListener("change", async (event) => {
+          const file = event.target.files[0];
+          if (!file) return;
+          try {
+            // Keep the previous attachment when validation fails.
+            const archive = TrackDrawViewer.readViewerArchive(
+              new Uint8Array(await file.arrayBuffer())
+            );
+            const nextAssets =
+              TrackDrawViewer.createViewerArchiveAssets(archive);
+            viewer?.destroy();
+            assets?.dispose();
+            assets = nextAssets;
+            viewer = TrackDrawViewer.createTrackDrawViewer(
+              document.querySelector("#viewer"),
+              {
+                design: archive.snapshot.design,
+                assetResolver: assets.assetResolver,
+              }
+            );
+            document.querySelector("#status").textContent =
+              archive.snapshot.design.title;
+          } catch (error) {
+            document.querySelector("#status").textContent = error.message;
+          }
+        });
+      window.addEventListener("pagehide", () => {
+        viewer?.destroy();
+        assets?.dispose();
+      });
+    </script>
+  </body>
+</html>

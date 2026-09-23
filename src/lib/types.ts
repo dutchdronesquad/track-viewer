@@ -150,33 +150,5 @@ export interface MapReference {
   locked: boolean;
 }
 
-export interface TrackDesign {
-  id: UUID;
-  version: 2;
-  title: string;
-  description?: string;
-  tags?: string[];
-  authorName?: string;
-  inventory: InventoryProfile;
-  field: FieldSpec;
-  mapReference?: MapReference | null;
-  shapeOrder: UUID[];
-  shapeById: Record<UUID, Shape>;
-  createdAt: string; // ISO-8601
-  updatedAt: string; // ISO-8601
-}
-
-export interface SerializedTrackDesign {
-  id: UUID;
-  version: 1 | 2;
-  title: string;
-  description?: string;
-  tags?: string[];
-  authorName?: string;
-  inventory: InventoryProfile;
-  field: FieldSpec;
-  mapReference?: MapReference | null;
-  shapes: Shape[];
-  createdAt: string;
-  updatedAt: string;
-}
+/** The read-only renderer consumes the portable snapshot design. */
+export type TrackDesign = import("../snapshot/types").ViewerDesign;

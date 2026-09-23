@@ -33,6 +33,7 @@ export const CURRENT_REQUIRED_VIEWER: RequiredViewer = {
  * this simple floor check.
  */
 function semverLt(a: string, b: string): boolean {
+  if (!/^\d+\.\d+\.\d+$/.test(a) || !/^\d+\.\d+\.\d+$/.test(b)) return true;
   const pa = a.split(".").map(Number);
   const pb = b.split(".").map(Number);
   for (let i = 0; i < Math.max(pa.length, pb.length); i++) {

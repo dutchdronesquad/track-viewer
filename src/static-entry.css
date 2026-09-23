@@ -1,24 +1,12 @@
-/*
- * Compiled by scripts/build-css.mjs (@tailwindcss/cli) into
- * dist/static/trackdraw-viewer.css for the static browser build - a plain
- * <script>-tag host has no Tailwind pipeline of its own, so this file ships
- * both the Tailwind utility classes the viewer's components use and the
- * TrackDraw theme tokens those utilities resolve against (bg-card,
- * border-border, etc. are custom tokens, not stock Tailwind colors).
- *
- * This is a deliberate copy of the trackdraw app's src/app/globals.css
- * tokens/base layer, not an import of it - the app's own globals.css also
- * carries app-chrome-only rules (scrollbar styling, brand-utility classes)
- * that are harmless here but not the point. Keep the :root/.dark/@theme
- * inline blocks in sync manually if the design system's tokens change.
- */
-@import "tailwindcss";
+@layer theme, base, components, utilities;
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" layer(utilities);
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
-@custom-variant dark (&:is(.dark *));
+@custom-variant dark (&:where(.trackdraw-viewer[data-theme="dark"] *));
 
-:root {
+.trackdraw-viewer {
   --radius: 0.625rem;
   --brand-primary: #1e93db;
   --brand-secondary: #f0761d;
@@ -61,7 +49,7 @@
   --chart-5: oklch(0.62 0.24 10);
 }
 
-.dark {
+.trackdraw-viewer[data-theme="dark"] {
   --background: oklch(0.155 0.012 245);
   --foreground: oklch(0.96 0.004 245);
   --card: oklch(0.205 0.016 245);
@@ -145,14 +133,36 @@
 }
 
 @layer base {
-  * {
+  .trackdraw-viewer,
+  .trackdraw-viewer * {
     @apply border-border outline-ring/50;
     box-sizing: border-box;
+    border-style: solid;
+    border-width: 0;
   }
-  body {
+  .trackdraw-viewer {
     @apply bg-background text-foreground;
     font-family: var(--font-sans);
+    font-size: 16px;
+    line-height: 1.5;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+@layer base {
+  .trackdraw-viewer button {
+    appearance: none;
+    font: inherit;
+    letter-spacing: inherit;
+    color: inherit;
+    background: transparent;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+  }
+  .trackdraw-viewer svg {
+    display: block;
+    vertical-align: middle;
   }
 }
