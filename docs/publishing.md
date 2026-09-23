@@ -10,6 +10,17 @@ The workflow validates the tag, uses `npm version --no-git-tag-version` in its t
 
 Lint, formatting, typechecks and tests stay in the existing CI workflow. Publish releases only from reviewed commits with green CI; the publication workflow does not repeat or enforce those checks. `npm ci` builds through the existing `prepare` lifecycle; `npm publish --ignore-scripts` avoids building a second time.
 
+## Release drafts and labels
+
+The repository follows the [organization's GitHub defaults](https://github.com/dutchdronesquad/.github#readme):
+
+- `.github/workflows/release-drafter.yml` updates a draft after pushes to `main` and supports manual runs. With no local `.github/release-drafter.yml`, it inherits the organization's categories, version resolver and `v$RESOLVED_VERSION` tag template. Apply the appropriate shared PR labels so release notes and version suggestions are useful.
+- `.github/workflows/sync-labels.yml` uses Label Blueprint to read the organization's `.github/labels.yml` weekly and on manual runs. It preserves additional repository labels; no separate token is needed.
+
+After merging these workflows, run **Actions → Sync labels → Run workflow** on `main` once to populate the labels immediately. Later runs synchronize automatically. Release Drafter runs on the merge's push to `main`; **Actions → Release Drafter → Run workflow** can refresh the draft after correcting labels.
+
+Review the generated draft under **Releases**, check its target commit, tag and notes, then publish it. For the first release, explicitly choose `v0.1.0` rather than blindly accepting the suggested version. Creating/updating a draft does not publish to npm; publishing it triggers the existing npm workflow. Git's package version remains `0.0.0` throughout.
+
 ## Why no separate publish action?
 
 We use the official `actions/setup-node` action and npm's own publish command. [`JS-DevTools/npm-publish`](https://github.com/JS-DevTools/npm-publish#readme) exists, but its maintainers recommend this direct approach for tag-based releases. Its extra version-detection logic is unnecessary here: our release tag already selects the version.
@@ -74,7 +85,7 @@ See [npm trusted publishing](https://docs.npmjs.com/trusted-publishers/). If aut
 ## Each release
 
 1. Merge the intended code changes after CI passes; leave both package manifests at `0.0.0`.
-2. In GitHub Releases, create a release targeting the merged commit with a stable version tag, for example `v0.1.0`. Review the notes and publish the release. The tag's commit must contain this workflow.
+2. In GitHub Releases, open the generated draft, check that it targets the merged commit and has the intended stable version tag, for example `v0.1.0`. Review the notes and publish the release. The tag's commit must contain this workflow.
 3. Check the **Publish to npm** run, then verify `npm view @trackdraw/viewer@<version> version dist.integrity` and install that exact version in a clean consumer. A published GitHub Release does not by itself prove npm publication succeeded.
 
 `RENDERER_VERSION` reads `package.json`, so the shipped code reports the actual release version. For an unreleased `0.0.0` checkout it falls back to the development renderer's supported baseline (`0.1.0`). Keep `CURRENT_REQUIRED_VIEWER.minRendererVersion` at the oldest renderer that actually supports that snapshot contract; do not automatically raise the compatibility floor for every release. The release tag must be at least that floor.
