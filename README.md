@@ -23,7 +23,7 @@ npm run test
 npm run build
 ```
 
-**Not yet published to npm.** `npm run build` produces `dist/`, but nothing publishes it to a registry yet — that's deferred until a real consumer needs an installable version. Until then, trackdraw (and any other consumer) pins a git dependency on a specific commit of this repo.
+**First npm publication pending.** Stable GitHub Releases publish through `.github/workflows/publish.yml` after building. Follow the [first-publication checklist](docs/publishing.md#first-publication-maintainer-checklist) to set up the npm organization, temporary first-release token and trusted publishing. The same guide covers subsequent releases. Until the first successful publication, TrackDraw continues to pin a git dependency.
 
 ## Builds
 
