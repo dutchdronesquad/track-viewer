@@ -23,7 +23,7 @@ npm run test
 npm run build
 ```
 
-**First npm publication pending.** Stable GitHub Releases publish through `.github/workflows/publish.yml` after building. See [Publishing](docs/publishing.md) for the one-time npm setup and release steps. Until the first successful publication, TrackDraw continues to pin a git dependency.
+**First npm publication pending.** Stable GitHub Releases publish through `.github/workflows/publish.yml` after building. Follow the [first-publication checklist](docs/publishing.md#first-publication-maintainer-checklist) to set up the npm organization, temporary first-release token and trusted publishing. The same guide covers subsequent releases. Until the first successful publication, TrackDraw continues to pin a git dependency.
 
 ## Builds
 

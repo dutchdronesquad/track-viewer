@@ -10,22 +10,66 @@ The workflow validates the tag, uses `npm version --no-git-tag-version` in its t
 
 Lint, formatting, typechecks and tests stay in the existing CI workflow. Publish releases only from reviewed commits with green CI; the publication workflow does not repeat or enforce those checks. `npm ci` builds through the existing `prepare` lifecycle; `npm publish --ignore-scripts` avoids building a second time.
 
-## One-time npm setup
+## Why no separate publish action?
 
-A Dutch Drone Squad maintainer must establish ownership of the `@trackdraw` npm organization and grant the publishing account access. Do not create an organization under an arbitrary personal owner. Credentials belong in npm/GitHub settings, never in this repository or a chat.
+We use the official `actions/setup-node` action and npm's own publish command. [`JS-DevTools/npm-publish`](https://github.com/JS-DevTools/npm-publish#readme) exists, but its maintainers recommend this direct approach for tag-based releases. Its extra version-detection logic is unnecessary here: our release tag already selects the version.
 
-Prefer [npm trusted publishing](https://docs.npmjs.com/trusted-publishers/). Configure the package's trusted publisher with these exact values once the package settings are available:
+## First publication: maintainer checklist
 
-- Provider: GitHub Actions
-- Organization: `dutchdronesquad`
-- Repository: `track-viewer`
-- Workflow filename: `publish.yml`
-- Environment: leave empty (the workflow does not use a GitHub environment)
-- Allow direct `npm publish` if the npm settings offer an allowed-actions choice.
+These are manual npm/GitHub account steps. Merging this PR does not create an organization, configure authentication or publish a package. Keep credentials in account settings, never in this repository or a chat.
 
-For a new package whose trusted-publisher settings are not yet available, bootstrap the first release through the same workflow using a short-lived granular npm write token, permitted to create `@trackdraw/viewer`, with bypass-2FA permission for CI. Store it as the repository Actions secret `NPM_TOKEN`. After the first successful publication, configure trusted publishing, remove the secret and revoke the bootstrap token. Subsequent releases use OIDC without a stored token. The workflow uses a GitHub-hosted runner, Node 24 and npm 11 (trusted publishing requires npm >=11.5.1).
+### 1. Create or confirm the npm organization
 
-No account creation, token setup or live publication is performed by merging the workflow PR.
+Sign in to [npm](https://www.npmjs.com/) using the maintainer's own account. From the profile menu choose **Add an Organization**, name it **trackdraw** (without `@`), and select the free **Unlimited public packages** plan. Agree within Dutch Drone Squad who owns/administers the organization and ensure the publishing account can publish under its scope. If the name is unavailable, resolve ownership before continuing; do not silently change the package name.
+
+The npm scope is `@trackdraw`; the GitHub organization is `dutchdronesquad`. They do not need the same name. See [npm organization setup](https://docs.npmjs.com/creating-an-organization/).
+
+### 2. Set up the first-publication token
+
+The intended steady state is trusted publishing. If the package does not exist yet and its publisher settings are unavailable, use a temporary token for the first release:
+
+1. In npm's profile menu, open **Access Tokens → Generate New Token**.
+2. Name it `track-viewer-first-publish`; choose a short expiration, for example one day.
+3. Under **Packages and scopes**, select **Read and write (publish and stage)** and restrict it to the `@trackdraw` scope. The new package cannot yet be selected individually. The token's account must already have publishing rights.
+4. Enable **Bypass two-factor authentication** for this CI token. Leave organization-management permissions at **No access**; those permissions do not grant package publishing rights.
+5. Copy the generated token into [track-viewer's Actions secrets](https://github.com/dutchdronesquad/track-viewer/settings/secrets/actions): **New repository secret**, name **NPM_TOKEN**.
+
+See [npm's token instructions](https://docs.npmjs.com/creating-and-viewing-access-tokens/). Do not use `GITHUB_TOKEN` for the npm registry.
+
+### 3. Publish the first release
+
+Merge the workflow and wait for green CI. Open [New GitHub release](https://github.com/dutchdronesquad/track-viewer/releases/new), create tag **v0.1.0** targeting the merged commit, add release notes, leave **pre-release** unchecked and publish.
+
+Watch **Publish to npm** in [Actions](https://github.com/dutchdronesquad/track-viewer/actions/workflows/publish.yml). Confirm the package at [npm](https://www.npmjs.com/package/@trackdraw/viewer) and run:
+
+```sh
+npm view @trackdraw/viewer@0.1.0 version dist.integrity
+```
+
+Use a clean temporary project to check installation:
+
+```sh
+mkdir viewer-install-check
+cd viewer-install-check
+npm init -y
+npm install @trackdraw/viewer@0.1.0
+```
+
+### 4. Switch to trusted publishing
+
+Once the package exists, open its **Settings → Trusted Publisher** on npm and select **GitHub Actions**. Enter:
+
+| Field                     | Value                      |
+| ------------------------- | -------------------------- |
+| Organization or user      | `dutchdronesquad`          |
+| Repository                | `track-viewer`             |
+| Workflow filename         | `publish.yml`              |
+| Environment               | Leave empty                |
+| Allowed actions, if shown | Allow direct `npm publish` |
+
+Save, remove the GitHub `NPM_TOKEN` secret and revoke the temporary token in npm. The next release uses OIDC; the workflow already has `id-token: write`, a GitHub-hosted runner and a compatible npm version. No new secret is needed. Configuration is not proof of a successful OIDC publish: verify the next genuine release's workflow and npm result. No empty test release is necessary.
+
+See [npm trusted publishing](https://docs.npmjs.com/trusted-publishers/). If authentication fails, check those exact field values and the workflow log before changing anything else.
 
 ## Each release
 
