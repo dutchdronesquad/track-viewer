@@ -6,7 +6,9 @@ Part of [trackdraw#876](https://github.com/dutchdronesquad/trackdraw/issues/876)
 
 Keep `package.json` and `package-lock.json` at `0.0.0` in Git. Publish a GitHub Release tagged `vX.Y.Z`; that tag is the release version. No version-bump PR, release-please or Changesets setup is needed. Only a stable release's `published` event publishes to npm; draft releases, prereleases and tag pushes alone do not. `0.0.0` is reserved for development.
 
-The workflow validates the tag and sets the package, lockfile and renderer versions in its temporary checkout without creating a commit or tag. It runs the existing build through `npm ci`'s `prepare` lifecycle, runs lint/format/type/tests, checks the built renderer version, packs the result and publishes that tarball with provenance to the public npm registry under `latest`. Runs are serialized without cancelling an active publish.
+The workflow validates the tag, uses `npm version --no-git-tag-version` in its temporary checkout, installs/builds with `npm ci`, then runs `npm publish`. The renderer reads the package version, so there is no separate source rewrite. The package's `publishConfig` selects the public npm registry and public access; npm uses `latest`. Runs are serialized without cancelling an active publish.
+
+Lint, formatting, typechecks and tests stay in the existing CI workflow. Publish releases only from reviewed commits with green CI; the publication workflow does not repeat or enforce those checks. `npm ci` builds through the existing `prepare` lifecycle; `npm publish --ignore-scripts` avoids building a second time.
 
 ## One-time npm setup
 
@@ -31,7 +33,7 @@ No account creation, token setup or live publication is performed by merging the
 2. In GitHub Releases, create a release targeting the merged commit with a stable version tag, for example `v0.1.0`. Review the notes and publish the release. The tag's commit must contain this workflow.
 3. Check the **Publish to npm** run, then verify `npm view @trackdraw/viewer@<version> version dist.integrity` and install that exact version in a clean consumer. A published GitHub Release does not by itself prove npm publication succeeded.
 
-`RENDERER_VERSION` is stamped before compilation so the shipped code reports the actual release version. The source value remains the development renderer's supported baseline. Keep `CURRENT_REQUIRED_VIEWER.minRendererVersion` at the oldest renderer that actually supports that snapshot contract; do not automatically raise the compatibility floor for every release. The release tag must be at least that floor.
+`RENDERER_VERSION` reads `package.json`, so the shipped code reports the actual release version. For an unreleased `0.0.0` checkout it falls back to the development renderer's supported baseline (`0.1.0`). Keep `CURRENT_REQUIRED_VIEWER.minRendererVersion` at the oldest renderer that actually supports that snapshot contract; do not automatically raise the compatibility floor for every release. The release tag must be at least that floor.
 
 If a run fails before publishing, fix setup and rerun the failed job where appropriate. If the package version already exists, inspect the registry before retrying: npm versions cannot be overwritten. Code changes require a new version and release, not moving an existing published tag. Prerelease channels are deliberately not part of this initial workflow.
 

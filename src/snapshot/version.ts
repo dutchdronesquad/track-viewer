@@ -1,3 +1,4 @@
+import { version } from "../../package.json";
 import { VIEWER_SNAPSHOT_SCHEMA, type RequiredViewer } from "./types";
 
 /**
@@ -19,7 +20,8 @@ export const RENDERER_CAPABILITIES = [
   "catalog:multigp",
 ] as const;
 
-export const RENDERER_VERSION = "0.1.0";
+// Unreleased checkouts use the original renderer baseline for compatibility.
+export const RENDERER_VERSION = version === "0.0.0" ? "0.1.0" : version;
 
 export const CURRENT_REQUIRED_VIEWER: RequiredViewer = {
   schema: VIEWER_SNAPSHOT_SCHEMA,
