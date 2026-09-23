@@ -20,7 +20,17 @@ function validSnapshot(): ViewerDesignSnapshot {
       version: 2,
       title: "Test Track",
       field: { width: 60, height: 40, origin: "tl", gridStep: 1, ppm: 20 },
-      shapes: [{ id: "gate-1", kind: "gate", x: 0, y: 0, rotation: 0 }],
+      shapes: [
+        {
+          id: "gate-1",
+          kind: "gate",
+          x: 0,
+          y: 0,
+          rotation: 0,
+          width: 3,
+          height: 2,
+        },
+      ],
       updatedAt: "2026-01-01T00:00:00.000Z",
     },
     assets: [],
@@ -109,5 +119,56 @@ describe("validateViewerDesignSnapshot", () => {
         expect(failure.byteLength).toBeGreaterThan(MAX_VIEWER_SNAPSHOT_BYTES);
       }
     }
+  });
+});
+
+describe("renderable shape contract", () => {
+  it.each([
+    { kind: "polyline" },
+    { kind: "label" },
+    { kind: "gate" },
+    { kind: "barrier", width: 3, height: 1, variant: "unknown" },
+    { kind: "ladder", width: 3, height: 2, rungs: 1_000_000 },
+    { kind: "unknown" },
+  ])("rejects malformed shape %j", (shape) => {
+    const snapshot = validSnapshot();
+    expect(() =>
+      validateViewerDesignSnapshot({
+        ...snapshot,
+        design: {
+          ...snapshot.design,
+          shapes: [{ id: "invalid", x: 0, y: 0, rotation: 0, ...shape }],
+        },
+      })
+    ).toThrow(ViewerSnapshotValidationError);
+  });
+
+  it("strips unknown fields from geometry and nested metadata", () => {
+    const snapshot = validSnapshot();
+    const clean = validateViewerDesignSnapshot({
+      ...snapshot,
+      source: { id: "private" },
+      design: {
+        ...snapshot.design,
+        authorName: "private",
+        shapes: [
+          {
+            ...snapshot.design.shapes[0],
+            secret: "private",
+            meta: { timing: "private" },
+          },
+        ],
+      },
+    });
+    expect(JSON.stringify(clean)).not.toContain("private");
+  });
+
+  it("rejects duplicate shape IDs and zero-size fields", () => {
+    const snapshot = validSnapshot();
+    snapshot.design.shapes.push(snapshot.design.shapes[0]);
+    expect(() => validateViewerDesignSnapshot(snapshot)).toThrow();
+    snapshot.design.shapes.pop();
+    snapshot.design.field.ppm = 0;
+    expect(() => validateViewerDesignSnapshot(snapshot)).toThrow();
   });
 });

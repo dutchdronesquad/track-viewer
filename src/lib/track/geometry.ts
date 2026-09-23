@@ -471,11 +471,17 @@ export function getPolylineArrowMarkers(
   const totalLength = distances.at(-1) ?? 0;
   if (totalLength < spacing) return [];
 
-  const startOffset = closed ? spacing / 2 : spacing;
+  // Tiny user-supplied spacing must never allocate an unbounded marker list.
+  const effectiveSpacing = Math.max(spacing, totalLength / 1000);
+  const startOffset = closed ? effectiveSpacing / 2 : effectiveSpacing;
   const markers: Array<{ x: number; y: number; angle: number }> = [];
 
-  for (let target = startOffset; target < totalLength; target += spacing) {
-    let segmentIndex = 1;
+  let segmentIndex = 1;
+  for (
+    let target = startOffset;
+    target < totalLength && markers.length < 1000;
+    target += effectiveSpacing
+  ) {
     while (
       segmentIndex < distances.length &&
       distances[segmentIndex] < target

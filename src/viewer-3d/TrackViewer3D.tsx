@@ -9,10 +9,11 @@
 "use client";
 
 import { OrbitControls } from "@react-three/drei";
-import { Canvas } from "@react-three/fiber";
+import { Canvas, useThree } from "@react-three/fiber";
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 import {
   Suspense,
+  useEffect,
   forwardRef,
   useCallback,
   useImperativeHandle,
@@ -22,7 +23,7 @@ import {
 } from "react";
 import * as THREE from "three";
 import { useIsTouchDevice } from "../hooks/use-mobile";
-import { createAssetResolver } from "../assets/asset-url";
+import { createAssetResolver, type AssetResolver } from "../assets/asset-url";
 import {
   getViewerDesignShapes,
   getViewerPrimaryPolylineId,
@@ -52,16 +53,27 @@ export interface TrackViewer3DProps {
   theme?: "light" | "dark";
   showGizmo?: boolean;
   assetsBaseUrl?: string;
+  assetResolver?: AssetResolver;
+  active?: boolean;
+  onUnavailable(): void;
 }
 
 const TrackViewer3D = forwardRef<TrackViewer3DHandle, TrackViewer3DProps>(
   function TrackViewer3D(
-    { design, theme = "light", showGizmo = true, assetsBaseUrl = "" },
+    {
+      design,
+      theme = "light",
+      showGizmo = true,
+      assetsBaseUrl = "",
+      assetResolver: resolveAsset,
+      active = true,
+      onUnavailable,
+    },
     ref
   ) {
     const assetResolver = useMemo(
-      () => createAssetResolver(assetsBaseUrl),
-      [assetsBaseUrl]
+      () => resolveAsset ?? createAssetResolver(assetsBaseUrl),
+      [assetsBaseUrl, resolveAsset]
     );
     const field = design.field;
     const shapes = useMemo(() => getViewerDesignShapes(design), [design]);
@@ -120,6 +132,7 @@ const TrackViewer3D = forwardRef<TrackViewer3DHandle, TrackViewer3DProps>(
         }}
       >
         <Canvas
+          frameloop={active ? "always" : "never"}
           shadows="percentage"
           camera={{
             position: [cx - 14, 18, cz + 20],
@@ -129,6 +142,7 @@ const TrackViewer3D = forwardRef<TrackViewer3DHandle, TrackViewer3DProps>(
           }}
           gl={{ antialias: true, preserveDrawingBuffer: true }}
         >
+          <ContextLossGuard onUnavailable={onUnavailable} />
           <color attach="background" args={[t.skyHorizon]} />
           <fog attach="fog" args={[t.fog, 80, 260]} />
           <GradientSky topColor={t.skyTop} horizonColor={t.skyHorizon} />
@@ -169,7 +183,6 @@ const TrackViewer3D = forwardRef<TrackViewer3DHandle, TrackViewer3DProps>(
           {shapeNodes}
 
           <FieldWatermark
-            assetResolver={assetResolver}
             fw={field.width}
             fh={field.height}
             isDark={theme === "dark"}
@@ -238,3 +251,16 @@ const TrackViewer3D = forwardRef<TrackViewer3DHandle, TrackViewer3DProps>(
 );
 
 export default TrackViewer3D;
+
+function ContextLossGuard({ onUnavailable }: { onUnavailable(): void }) {
+  const gl = useThree((state) => state.gl);
+  useEffect(() => {
+    const lost = (event: Event) => {
+      event.preventDefault();
+      onUnavailable();
+    };
+    gl.domElement.addEventListener("webglcontextlost", lost);
+    return () => gl.domElement.removeEventListener("webglcontextlost", lost);
+  }, [gl, onUnavailable]);
+  return null;
+}

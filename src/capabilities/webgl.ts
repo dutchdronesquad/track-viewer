@@ -11,10 +11,9 @@ export function detectWebglSupport(
   if (typeof document === "undefined") return "unsupported";
   try {
     const canvas = createCanvas();
-    const gl =
-      canvas.getContext("webgl2") ??
-      canvas.getContext("webgl") ??
-      canvas.getContext("experimental-webgl");
+    // Three.js requires WebGL2. Release the probe context immediately.
+    const gl = canvas.getContext("webgl2");
+    gl?.getExtension?.("WEBGL_lose_context")?.loseContext();
     return gl ? "supported" : "unsupported";
   } catch {
     return "unsupported";

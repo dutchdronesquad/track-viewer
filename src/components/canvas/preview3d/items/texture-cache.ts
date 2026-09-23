@@ -66,19 +66,27 @@ function getTextTextureCacheKey(
   ].join("");
 }
 
-function createTextTexture(
+export function createTextTexture(
   text: string,
   color: string,
   fontSize: number,
   options: Required<TextTextureOptions>
 ): THREE.CanvasTexture {
   const scale = 4;
-  const measW = Math.max(256, text.length * fontSize * scale * 0.62 + 40);
+  const measW = Math.max(
+    256,
+    text.length * fontSize * scale * 0.62 +
+      Math.abs(options.letterSpacing) * text.length * scale +
+      40
+  );
   const measH = fontSize * scale * 2;
   const canvas = document.createElement("canvas");
-  canvas.width = measW;
-  canvas.height = measH;
-  const ctx = canvas.getContext("2d")!;
+  const downscale = Math.min(1, 2048 / Math.max(measW, measH));
+  canvas.width = Math.max(1, Math.ceil(measW * downscale));
+  canvas.height = Math.max(1, Math.ceil(measH * downscale));
+  const ctx = canvas.getContext("2d");
+  if (!ctx) throw new Error("2D canvas is unavailable for label rendering.");
+  ctx.scale(downscale, downscale);
   ctx.clearRect(0, 0, measW, measH);
   ctx.fillStyle = color;
   ctx.font = `${options.fontStyle} ${options.fontWeight} ${

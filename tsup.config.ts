@@ -11,6 +11,9 @@ export default defineConfig([
       "snapshot/types": "src/snapshot/types.ts",
       "snapshot/version": "src/snapshot/version.ts",
       "snapshot/schema": "src/snapshot/schema.ts",
+      "snapshot/api": "src/snapshot/api.ts",
+      "snapshot/identity": "src/snapshot/identity.ts",
+      "snapshot/archive": "src/snapshot/archive.ts",
       "assets/manifest": "src/assets/manifest.ts",
       "assets/texture-paths": "src/assets/texture-paths.ts",
       "assets/asset-url": "src/assets/asset-url.ts",
@@ -38,7 +41,7 @@ export default defineConfig([
   // with no npm/bundler (e.g. a future RotorHazard plugin). React itself
   // must be bundled here since there is no npm environment on the host.
   {
-    entry: { "trackdraw-viewer": "src/mount.ts" },
+    entry: { "trackdraw-viewer": "src/static.ts" },
     format: ["iife"],
     globalName: "TrackDrawViewer",
     outDir: "dist/static",

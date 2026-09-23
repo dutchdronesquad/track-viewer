@@ -4,7 +4,9 @@
   "description": "Framework-neutral 2D/3D track viewer for TrackDraw course snapshots.",
   "license": "Apache-2.0",
   "type": "module",
-  "sideEffects": false,
+  "sideEffects": [
+    "**/*.css"
+  ],
   "files": [
     "dist",
     "LICENSE",
@@ -44,7 +46,22 @@
       "types": "./dist/assets/asset-url.d.ts",
       "import": "./dist/assets/asset-url.js"
     },
-    "./static/trackdraw-viewer.css": "./dist/static/trackdraw-viewer.css"
+    "./static/trackdraw-viewer.css": {
+      "types": "./dist/static/trackdraw-viewer.css.d.ts",
+      "default": "./dist/static/trackdraw-viewer.css"
+    },
+    "./snapshot/api": {
+      "types": "./dist/snapshot/api.d.ts",
+      "import": "./dist/snapshot/api.js"
+    },
+    "./snapshot/identity": {
+      "types": "./dist/snapshot/identity.d.ts",
+      "import": "./dist/snapshot/identity.js"
+    },
+    "./snapshot/archive": {
+      "types": "./dist/snapshot/archive.d.ts",
+      "import": "./dist/snapshot/archive.js"
+    }
   },
   "repository": {
     "type": "git",
@@ -68,10 +85,12 @@
     "react-dom": "^19.2.0"
   },
   "dependencies": {
+    "@noble/hashes": "^2.4.0",
     "@radix-ui/react-tooltip": "^1.2.8",
     "@react-three/drei": "^10.7.7",
     "@react-three/fiber": "^9.5.0",
     "clsx": "^2.1.1",
+    "fflate": "^0.8.3",
     "konva": "^10.0.2",
     "lucide-react": "^1.21.0",
     "react-konva": "19.2.7",
@@ -86,6 +105,7 @@
     "@types/three": "^0.185.0",
     "happy-dom": "^20.8.9",
     "oxlint": "^1.75.0",
+    "postcss": "^8.5.28",
     "prettier": "^3.8.1",
     "prettier-plugin-tailwindcss": "^0.8.0",
     "react": "19.2.8",

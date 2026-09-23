@@ -46,3 +46,13 @@ export {
   getAssetManifestEntry,
   getDesignAssetManifest,
 } from "./assets/manifest";
+
+export { viewerSnapshotFromApi } from "./snapshot/api";
+export { getViewerSnapshotId } from "./snapshot/identity";
+export {
+  createViewerArchive,
+  readViewerArchive,
+  createViewerArchiveAssets,
+  type ViewerArchive,
+} from "./snapshot/archive";
+export type { ViewerDesign } from "./snapshot/types";

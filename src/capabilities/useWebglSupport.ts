@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { detectWebglSupport, type WebglSupport } from "./webgl";
 
 /**
@@ -9,6 +9,12 @@ import { detectWebglSupport, type WebglSupport } from "./webgl";
  * lacks WebGL (used by the spike host page's simulate-fallback toggle).
  */
 export function useWebglSupport(forceUnsupported = false): WebglSupport {
-  const [detected] = useState<WebglSupport>(() => detectWebglSupport());
+  const [detected, setDetected] = useState<WebglSupport>("unsupported");
+  useEffect(() => {
+    const frame = requestAnimationFrame(() =>
+      setDetected(detectWebglSupport())
+    );
+    return () => cancelAnimationFrame(frame);
+  }, []);
   return forceUnsupported ? "unsupported" : detected;
 }

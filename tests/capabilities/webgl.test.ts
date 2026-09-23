@@ -1,6 +1,6 @@
 // @vitest-environment happy-dom
 
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { detectWebglSupport } from "@trackdraw/viewer/capabilities/webgl";
 
 function fakeCanvas(context: unknown): HTMLCanvasElement {
@@ -26,4 +26,21 @@ describe("detectWebglSupport", () => {
     } as unknown as HTMLCanvasElement;
     expect(detectWebglSupport(() => canvas)).toBe("unsupported");
   });
+});
+
+it("rejects WebGL1-only environments", () => {
+  const getContext = vi.fn((name) => (name === "webgl2" ? null : {}));
+  expect(
+    detectWebglSupport(() => ({ getContext }) as unknown as HTMLCanvasElement)
+  ).toBe("unsupported");
+  expect(getContext).toHaveBeenCalledExactlyOnceWith("webgl2");
+});
+it("releases the temporary detection context", () => {
+  const loseContext = vi.fn();
+  expect(
+    detectWebglSupport(() =>
+      fakeCanvas({ getExtension: () => ({ loseContext }) })
+    )
+  ).toBe("supported");
+  expect(loseContext).toHaveBeenCalledOnce();
 });

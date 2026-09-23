@@ -4,23 +4,20 @@
 // FlyThroughControlsOverlay and TrackPreview3DHintOverlays are cut from
 // Phase 1 scope — both are next-intl-coupled and drive the flythrough
 // feature, which this spike does not extract (see the extraction plan).
-// FieldWatermark's logo fetch is additionally routed through assetResolver
-// so it resolves under a non-root asset URL prefix.
+// The viewer-owned watermark is embedded for cold offline rendering.
 
 "use client";
 
 import { useEffect, useState } from "react";
 import * as THREE from "three";
-import type { AssetResolver } from "../assets/asset-url";
+import { WATERMARKS } from "../assets/brand";
 import type { QuaternionState } from "./shared-scene";
 
 export function FieldWatermark({
-  assetResolver,
   fw,
   fh,
   isDark,
 }: {
-  assetResolver: AssetResolver;
   fw: number;
   fh: number;
   isDark: boolean;
@@ -31,6 +28,10 @@ export function FieldWatermark({
   useEffect(() => {
     let active = true;
     const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onerror = () => {
+      if (active) setTexture(null);
+    };
     img.onload = () => {
       if (!active) return;
       const scale = 3;
@@ -41,7 +42,8 @@ export function FieldWatermark({
       const canvas = document.createElement("canvas");
       canvas.width = w;
       canvas.height = h;
-      const ctx = canvas.getContext("2d")!;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return;
       ctx.clearRect(0, 0, w, h);
       ctx.globalAlpha = isDark ? 0.12 : 0.06;
       ctx.drawImage(img, 0, 0, w, h);
@@ -52,14 +54,14 @@ export function FieldWatermark({
       });
       setAspect(sourceW / sourceH);
     };
-    img.src = assetResolver(
-      `/assets/brand/trackdraw-logo-mono-${isDark ? "darkbg" : "lightbg"}.svg`
-    );
+    img.src = isDark ? WATERMARKS.darkbg : WATERMARKS.lightbg;
 
     return () => {
       active = false;
+      img.onload = null;
+      img.onerror = null;
     };
-  }, [assetResolver, isDark]);
+  }, [isDark]);
 
   useEffect(() => () => texture?.dispose(), [texture]);
 
