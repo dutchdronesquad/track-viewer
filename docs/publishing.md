@@ -54,7 +54,7 @@ The npm scope is `@trackdraw`; the GitHub organization is `dutchdronesquad`. Cre
 
 [Release Drafter](../.github/workflows/release-drafter.yml) updates the draft after pushes to `main` and supports manual runs. It inherits the [organization's GitHub defaults](https://github.com/dutchdronesquad/.github#readme). Apply appropriate PR labels, particularly `breaking-change` for incompatible public API changes. Review generated notes and the suggested version before publishing.
 
-[Sync labels](../.github/workflows/sync-labels.yml) synchronizes the shared labels weekly and can be run manually. It preserves additional repository labels.
+Labels are synchronized centrally from the [organization's `.github` repository](https://github.com/dutchdronesquad/.github); this repository needs no local label workflow.
 
 ## Renderer compatibility and retries
 
