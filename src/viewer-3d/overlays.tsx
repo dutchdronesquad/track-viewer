@@ -88,7 +88,10 @@ export function AxisGizmoOverlay({
 
   return (
     <div className="pointer-events-none absolute top-3 right-3 select-none">
-      <div className="rounded-full border border-white/10 bg-black/45 p-2 shadow-md backdrop-blur-xs">
+      <div
+        data-viewer-gizmo
+        className="rounded-full border border-white/20 bg-[#17272e] p-2 shadow-md"
+      >
         <svg width="68" height="68" viewBox="0 0 68 68" aria-hidden="true">
           <circle
             cx="34"
