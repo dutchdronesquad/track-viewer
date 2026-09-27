@@ -172,9 +172,7 @@ export interface PvcSetGateVisualSpec {
 }
 
 export type GateVisualSpec =
-  | FrameOnlyGateVisualSpec
-  | PanelFrameGateVisualSpec
-  | PvcSetGateVisualSpec;
+  FrameOnlyGateVisualSpec | PanelFrameGateVisualSpec | PvcSetGateVisualSpec;
 
 export interface CornerMarkerFlagVisualSpec {
   kind: "flag";

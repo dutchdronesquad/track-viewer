@@ -51,8 +51,16 @@ export function renderGate(shape: GateShape, selected: boolean, ppm: number) {
           <Line
             key={`foot-${x}`}
             points={[
-              x - footSpan / 2, 0, x + footSpan / 2, 0,
-              x, 0, x, -footSpan / 2, x, footSpan / 2,
+              x - footSpan / 2,
+              0,
+              x + footSpan / 2,
+              0,
+              x,
+              0,
+              x,
+              -footSpan / 2,
+              x,
+              footSpan / 2,
             ]}
             stroke={base.outlineColor}
             strokeWidth={Math.max(1, tube * 0.45)}

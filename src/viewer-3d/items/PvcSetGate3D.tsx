@@ -58,22 +58,29 @@ export function PvcSetGate3D({
   const tubeColor = shape.color ?? visual.frame.color;
   const fittingColor = visual.fittings.color;
   const parts = useMemo(
-    () => getPvcSetGate3DParts(
-      { width: shape.width, height: shape.height },
-      visual
-    ),
+    () =>
+      getPvcSetGate3DParts(
+        { width: shape.width, height: shape.height },
+        visual
+      ),
     [shape.width, shape.height, visual]
   );
-  const geometries = useMemo(() => ({
-    cylinder: new THREE.CylinderGeometry(1, 1, 1, 16),
-    sphere: new THREE.SphereGeometry(1, 16, 12),
-    plane: new THREE.PlaneGeometry(1, 1),
-  }), []);
-  useEffect(() => () => {
-    geometries.cylinder.dispose();
-    geometries.sphere.dispose();
-    geometries.plane.dispose();
-  }, [geometries]);
+  const geometries = useMemo(
+    () => ({
+      cylinder: new THREE.CylinderGeometry(1, 1, 1, 16),
+      sphere: new THREE.SphereGeometry(1, 16, 12),
+      plane: new THREE.PlaneGeometry(1, 1),
+    }),
+    []
+  );
+  useEffect(
+    () => () => {
+      geometries.cylinder.dispose();
+      geometries.sphere.dispose();
+      geometries.plane.dispose();
+    },
+    [geometries]
+  );
 
   const materials = useMemo(() => {
     const emissive = selected ? "#60a5fa" : "#000000";
@@ -99,25 +106,30 @@ export function PvcSetGate3D({
         side: THREE.DoubleSide,
         depthWrite: false,
       }),
-      panel: markerColor ? new THREE.MeshStandardMaterial({
-        color: markerColor,
-        emissive: markerColor,
-        emissiveIntensity: 0.25,
-        transparent: true,
-        opacity: PVC_SET_MARKER_OPACITY,
-        side: THREE.DoubleSide,
-        depthWrite: false,
-        roughness: 0.6,
-        metalness: 0,
-      }) : null,
+      panel: markerColor
+        ? new THREE.MeshStandardMaterial({
+            color: markerColor,
+            emissive: markerColor,
+            emissiveIntensity: 0.25,
+            transparent: true,
+            opacity: PVC_SET_MARKER_OPACITY,
+            side: THREE.DoubleSide,
+            depthWrite: false,
+            roughness: 0.6,
+            metalness: 0,
+          })
+        : null,
     };
   }, [fittingColor, markerColor, selected, tubeColor]);
-  useEffect(() => () => {
-    materials.tube.dispose();
-    materials.fitting.dispose();
-    materials.hit.dispose();
-    materials.panel?.dispose();
-  }, [materials]);
+  useEffect(
+    () => () => {
+      materials.tube.dispose();
+      materials.fitting.dispose();
+      materials.hit.dispose();
+      materials.panel?.dispose();
+    },
+    [materials]
+  );
 
   return (
     <group ref={outerRef} position={[shape.x, 0, shape.y]} rotation={rot}>

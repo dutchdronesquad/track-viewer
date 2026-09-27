@@ -355,20 +355,30 @@ export function getPvcSetGate3DParts(
       flatten: PVC_SET_FOOT_FLATTEN,
     });
     for (const [axis, sign] of [
-      ["x", 1], ["x", -1], ["z", 1], ["z", -1],
+      ["x", 1],
+      ["x", -1],
+      ["z", 1],
+      ["z", -1],
     ] as const) {
       sleeves.push({
         key: `foot-sleeve-${name}-${axis}${sign}`,
-        center: axis === "x"
-          ? [x + (sign * reach) / 2, footY, 0]
-          : [x, footY, (sign * reach) / 2],
-        axis, length: reach, radius: footRadius, flatten: PVC_SET_FOOT_FLATTEN,
+        center:
+          axis === "x"
+            ? [x + (sign * reach) / 2, footY, 0]
+            : [x, footY, (sign * reach) / 2],
+        axis,
+        length: reach,
+        radius: footRadius,
+        flatten: PVC_SET_FOOT_FLATTEN,
       });
     }
     sleeves.push({
       key: `foot-sleeve-${name}-up`,
       center: [x, footY + reach / 2, 0],
-      axis: "y", length: reach, radius: sleeveRadius, flatten: 1,
+      axis: "y",
+      length: reach,
+      radius: sleeveRadius,
+      flatten: 1,
     });
     hubs.push({
       key: `elbow-hub-${name}`,
@@ -379,33 +389,49 @@ export function getPvcSetGate3DParts(
     sleeves.push({
       key: `elbow-sleeve-${name}-down`,
       center: [x, topY - reach / 2, 0],
-      axis: "y", length: reach, radius: sleeveRadius, flatten: 1,
+      axis: "y",
+      length: reach,
+      radius: sleeveRadius,
+      flatten: 1,
     });
     sleeves.push({
       key: `elbow-sleeve-${name}-in`,
       center: [x - (side * reach) / 2, topY, 0],
-      axis: "x", length: reach, radius: sleeveRadius, flatten: 1,
+      axis: "x",
+      length: reach,
+      radius: sleeveRadius,
+      flatten: 1,
     });
     const postLength = h - 2 * reach;
     if (postLength > 0) {
       tubes.push({
         key: `post-${name}`,
         center: [x, footY + h / 2, 0],
-        axis: "y", length: postLength, radius: pipeRadius, flatten: 1,
+        axis: "y",
+        length: postLength,
+        radius: pipeRadius,
+        flatten: 1,
       });
     }
   }
   const barLength = w - 2 * reach;
   if (barLength > 0) {
     tubes.push({
-      key: "top-bar", center: [0, topY, 0], axis: "x",
-      length: barLength, radius: pipeRadius, flatten: 1,
+      key: "top-bar",
+      center: [0, topY, 0],
+      axis: "x",
+      length: barLength,
+      radius: pipeRadius,
+      flatten: 1,
     });
   }
   const openingTop = topY - pipeRadius;
   const openingHeight = Math.max(0, openingTop - footY);
   return {
-    pipeRadius, tubes, sleeves, hubs,
+    pipeRadius,
+    tubes,
+    sleeves,
+    hubs,
     opening: {
       center: [0, footY + openingHeight / 2, 0] as Point3Tuple,
       width: Math.max(0, w - 2 * pipeRadius),
