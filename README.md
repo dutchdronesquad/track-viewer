@@ -69,7 +69,7 @@ For imported JSON, use `validateViewerDesignSnapshot` from `@trackdraw/viewer/sn
 
 For TrackDraw REST API responses, pass `response.data` through `viewerSnapshotFromApi` from `@trackdraw/viewer/snapshot/api`. Raw API shapes use a different format and should not be passed directly to the viewer.
 
-The [integration guide](https://github.com/dutchdronesquad/track-viewer/blob/main/docs/integration.md) covers validation, compatibility, snapshot identity, and archive creation.
+The [integration guide](https://github.com/dutchdronesquad/track-viewer/blob/main/docs/integration.md) includes a validation example, mount options, external 2D/3D controls, and archive creation.
 
 ## Offline viewing and assets
 
@@ -85,7 +85,7 @@ Use a modern browser with ES modules, ResizeObserver, and CSS nesting support. T
 
 Each viewer owns its theme and viewport. Styles are scoped to the viewer, and the package does not install account calls, analytics, or persistent browser storage. A 2D-only viewer does not mount a WebGL renderer or load 3D textures.
 
-## Migrating from the previous entry point
+## Migrating to v1.0.0
 
 The package now exposes the standalone mount API instead of a public `<TrackViewer />` component. React applications can call `createTrackDrawViewer` from an effect and call `destroy()` in its cleanup. Existing `@trackdraw/viewer/mount` and snapshot/asset imports continue to work. Replace the old `TrackViewerProps` type with `TrackDrawViewerOptions`, or derive the options with `Parameters<typeof createTrackDrawViewer>[1]`.
 
