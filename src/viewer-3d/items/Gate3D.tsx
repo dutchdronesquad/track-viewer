@@ -20,6 +20,7 @@ import {
   resolvePanelFrameTextureMapping,
 } from "../../lib/track/render3d-layout";
 import { getGateVisualSpec } from "../../lib/track/elements/visual";
+import { PvcSetGate3D } from "./PvcSetGate3D";
 import {
   getShapeTimingMarker,
   getTimingMarkerColor,
@@ -396,6 +397,18 @@ export function Gate3D({
     (-(shape.rotation + 180) * Math.PI) / 180,
     0,
   ];
+
+  if (visual.variant === "pvc-set") {
+    return (
+      <PvcSetGate3D
+        shape={shape}
+        selected={selected}
+        outerRef={outerRef}
+        visual={visual}
+        rot={rot}
+      />
+    );
+  }
 
   if (visual.variant === "panel-frame") {
     return (
