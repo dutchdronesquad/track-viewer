@@ -1,4 +1,9 @@
-export { TrackViewer, type TrackViewerProps } from "./TrackViewer";
+export {
+  TrackViewer,
+  type TrackViewerProps,
+  type ViewerView,
+  type ViewerViewState,
+} from "./TrackViewer";
 export { createTrackDrawViewer, type TrackDrawViewerHandle } from "./mount";
 export type {
   BarrierVariant,

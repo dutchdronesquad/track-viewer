@@ -103,3 +103,84 @@ describe("standalone mount lifecycle", () => {
     });
   });
 });
+
+describe("host controls", () => {
+  it("updates modes without remounting and reports unsupported fallback", async () => {
+    const container = document.createElement("div");
+    document.body.append(container);
+    const onViewStateChange = vi.fn();
+    const options = {
+      design: snapshotFixture().design,
+      showViewControls: false,
+      onViewStateChange,
+    };
+    let handle!: ReturnType<typeof createTrackDrawViewer>;
+    await act(async () => {
+      handle = createTrackDrawViewer(container, { ...options, view: "2d" });
+    });
+    const canvas = container.querySelector('[data-view="2d"]');
+    expect(container.querySelector("button")).toBeNull();
+    expect(onViewStateChange).toHaveBeenLastCalledWith({
+      view: "2d",
+      available3D: true,
+    });
+    await act(async () => handle.update({ ...options, view: "3d" }));
+    expect(onViewStateChange).toHaveBeenLastCalledWith({
+      view: "3d",
+      available3D: true,
+    });
+    expect(container.querySelector('[data-view="2d"]')).toBe(canvas);
+    await act(async () =>
+      handle.update({ ...options, view: "3d", forceWebglUnsupported: true })
+    );
+    expect(onViewStateChange).toHaveBeenLastCalledWith({
+      view: "2d",
+      available3D: false,
+    });
+    expect(container.querySelector('[data-view="3d"]')).toBeNull();
+    await act(async () => handle.destroy());
+  });
+  it("reports renderer failure to external controls", async () => {
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    state.fail = true;
+    const container = document.createElement("div");
+    document.body.append(container);
+    const onViewStateChange = vi.fn();
+    let handle!: ReturnType<typeof createTrackDrawViewer>;
+    await act(async () => {
+      handle = createTrackDrawViewer(container, {
+        design: snapshotFixture().design,
+        view: "3d",
+        showViewControls: false,
+        onViewStateChange,
+      });
+    });
+    expect(onViewStateChange).toHaveBeenLastCalledWith({
+      view: "2d",
+      available3D: false,
+    });
+    await act(async () => handle.destroy());
+  });
+  it("keeps the default toolbar outside the canvas and honors controlled requests", async () => {
+    const container = document.createElement("div");
+    document.body.append(container);
+    const onViewChange = vi.fn();
+    let handle!: ReturnType<typeof createTrackDrawViewer>;
+    await act(async () => {
+      handle = createTrackDrawViewer(container, {
+        design: snapshotFixture().design,
+        view: "2d",
+        onViewChange,
+      });
+    });
+    expect(container.querySelector("[data-viewer-canvas] button")).toBeNull();
+    await act(async () =>
+      (container.querySelectorAll("button")[1] as HTMLButtonElement).click()
+    );
+    expect(onViewChange).toHaveBeenCalledWith("3d");
+    expect(
+      container.querySelector('button[aria-pressed="true"]')?.textContent
+    ).toBe("2D");
+    await act(async () => handle.destroy());
+  });
+});
