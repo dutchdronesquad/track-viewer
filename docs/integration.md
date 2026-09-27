@@ -1,0 +1,49 @@
+# Integration guide
+
+## Portable track contract
+
+`ViewerDesignSnapshot.design` is accepted directly as the `design` option of `createTrackDrawViewer`. It contains `version: 2`, `title`, `field`, `shapes`, and `updatedAt`; editor storage, inventory, ownership, and account data are not required. Validate untrusted JSON with `validateViewerDesignSnapshot` before rendering. Validation requires each shape kind's geometry, strips unknown fields, limits counts/dimensions and rejects duplicate IDs. `isViewerCompatible` checks the renderer floor and required capabilities separately.
+
+TrackDraw's REST API retains its existing snake_case response. Pass its `response.data` through `viewerSnapshotFromApi` (also exported at `./snapshot/api`) to obtain the same camelCase snapshot as a local export; private project provenance is stripped. Do not pass raw API shapes directly to the renderer.
+
+`getViewerSnapshotId` computes a deterministic SHA-256 identifier from validated public content. Property insertion order and asset/capability ordering do not change the ID. Geometry, display metadata, source update time and asset hashes do. Build the snapshot, validate it, then set `snapshotId` to this ID.
+
+Online texture URLs are stable and may receive compatible artwork updates independently of viewer releases. Snapshot asset hashes describe a captured revision, not a runtime pin on the online host.
+
+## Offline track archives
+
+A `.tdviewer.zip` contains `snapshot.json` and exactly the texture files listed in its manifest, under `assets/...`. It contains no executable code. The viewer's static script/CSS must be installed separately on the host. MultiGP images are included only for the track that uses them, not redistributed inside this npm package.
+
+```ts
+import { createTrackDrawViewer } from "@trackdraw/viewer";
+import {
+  readViewerArchive,
+  createViewerArchiveAssets,
+} from "@trackdraw/viewer/snapshot/archive";
+import "@trackdraw/viewer/static/trackdraw-viewer.css";
+
+const archive = readViewerArchive(new Uint8Array(await file.arrayBuffer()));
+const assets = createViewerArchiveAssets(archive);
+const viewer = createTrackDrawViewer(container, {
+  design: archive.snapshot.design,
+  assetResolver: assets.assetResolver,
+  theme: "light",
+});
+// When removing the preview:
+viewer.destroy();
+assets.dispose();
+```
+
+The static global exposes the same archive reader/object-URL helper alongside `createTrackDrawViewer`. See [the plain HTML example](../examples/static.html). For persistent hosting, store the verified archive files locally and use `assetsBaseUrl` pointing at their parent directory instead of temporary object URLs. Complete validation before replacing an existing event attachment.
+
+`createViewerArchiveWithCurrentAssets(snapshot, readAsset)` captures the current approved texture bytes and updates the archive manifest and snapshot ID. Use it when exporting from the live asset host; old archives remain readable and retain their own byte-integrity checks.
+
+`createViewerArchive(snapshot, readAsset)` lets browser exports and backend API adapters build the same archive. It never fetches implicitly: the caller supplies approved local bytes or an approved fetcher. It verifies catalog manifest completeness, renderer compatibility, stable snapshot identity, sizes and SHA-256 hashes before returning bytes. Import rejects missing, extra, duplicate and unsafe paths, unsupported tracks, corrupt assets, and oversized archives (4 MB snapshot, 8 MB per asset, 64 MB archive/expanded total). Hashes check integrity, not authorship. V1 supports the installed catalog assets only; user-uploaded imagery/maps are outside this contract.
+
+## Runtime and lifecycle
+
+Provide an explicitly sized container, e.g. `height: 420px; width: 100%`. Each viewer owns its theme and viewport; no host-wide reset, storage, account calls or analytics are installed. Choose `theme`, `unitSystem`, `labels`, `initialView`, and `showObstacleNumbers` per instance. `assetResolver` overrides `assetsBaseUrl` when supplied.
+
+2D-only instances do not mount a WebGL renderer or load 3D textures. Once visited, a hidden 3D scene pauses its frame loop while retaining its camera. 3D requires WebGL2; unavailable or failed initialization/context loss leaves the existing 2D view usable. `destroy()` unmounts the React root and releases instance resources. The watermark is embedded and requires no CDN CORS configuration; externally hosted catalog textures still require the asset host to permit CORS.
+
+Use a modern browser with ES modules, ResizeObserver, and CSS nesting support; WebGL2 is optional. The static artifact bundles React and all JavaScript dependencies. The ESM mount API also bundles React internally and requires no React installation in the host. ESM consumers need a bundler that resolves the package chunks. Serve the static JavaScript and CSS locally for cold offline use.

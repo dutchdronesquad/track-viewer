@@ -9,7 +9,7 @@ import {
 import { getViewerSnapshotId, sha256Hex } from "../../src/snapshot/identity";
 import { viewerSnapshotFromApi } from "../../src/snapshot/api";
 import { snapshotFixture } from "../helpers/snapshot";
-import type { TrackViewerProps } from "../../src/TrackViewer";
+import type { TrackDrawViewerOptions } from "../../src/viewer-options";
 
 function texturedFixture() {
   const bytes = new Uint8Array([1, 2, 3]);
@@ -26,13 +26,13 @@ function texturedFixture() {
   return { snapshot, bytes };
 }
 
-describe("portable course archive", () => {
+describe("portable track archive", () => {
   it("round-trips data and verified bytes into directly renderable props", async () => {
     const { snapshot, bytes } = texturedFixture();
     const archive = readViewerArchive(
       await createViewerArchive(snapshot, async () => bytes)
     );
-    const props: TrackViewerProps = { design: archive.snapshot.design };
+    const props: TrackDrawViewerOptions = { design: archive.snapshot.design };
     expect(props.design).toEqual(snapshot.design);
     expect(archive.assets.get("/assets/test.webp")).toEqual(bytes);
   });
@@ -65,7 +65,7 @@ describe("portable course archive", () => {
       readViewerArchive(zipSync({ "snapshot.json": new Uint8Array(4_000_001) }))
     ).toThrow(/large/);
   });
-  it("rejects changed course data and unsupported requirements", async () => {
+  it("rejects changed track data and unsupported requirements", async () => {
     const snapshot = snapshotFixture();
     snapshot.design.title = "tampered";
     await expect(

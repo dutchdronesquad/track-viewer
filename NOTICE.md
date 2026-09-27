@@ -6,7 +6,7 @@ Licensed under the Apache License, Version 2.0. See [LICENSE](LICENSE) for the f
 
 ## Status
 
-This repository is the standalone home of `@trackdraw/viewer`, a framework-neutral 2D/3D viewer for TrackDraw course designs. It was extracted from [`dutchdronesquad/trackdraw`](https://github.com/dutchdronesquad/trackdraw)'s `packages/viewer/` directory (tracked there as issue [#871](https://github.com/dutchdronesquad/trackdraw/issues/871)), preserving that directory's git history. `src/` has no source-level dependency on the trackdraw application — everything it needs (2D/3D catalog rendering, geometry, shape utilities) was vendored as copies before the split (trackdraw issue [#870](https://github.com/dutchdronesquad/trackdraw/issues/870)).
+This repository is the standalone home of `@trackdraw/viewer`, a framework-neutral 2D/3D viewer for TrackDraw track designs. It was extracted from [`dutchdronesquad/trackdraw`](https://github.com/dutchdronesquad/trackdraw)'s `packages/viewer/` directory (tracked there as issue [#871](https://github.com/dutchdronesquad/trackdraw/issues/871)), preserving that directory's git history. `src/` has no source-level dependency on the trackdraw application — everything it needs (2D/3D catalog rendering, geometry, shape utilities) was vendored as copies before the split (trackdraw issue [#870](https://github.com/dutchdronesquad/trackdraw/issues/870)).
 
 Separating this package from trackdraw's `AGPL-3.0-only` application makes the Apache-2.0 license boundary a structural fact rather than a code-review convention: hosts such as FPVScores or RotorHazard can depend on `@trackdraw/viewer` as a normal npm package without AGPL's copyleft obligations reaching their own codebase.
 

@@ -5,40 +5,10 @@ import { useWebglSupport } from "./capabilities/useWebglSupport";
 import { Viewer3DBoundary } from "./capabilities/Viewer3DBoundary";
 import { TooltipProvider } from "./components/AppTooltip";
 import { ViewerContainerContext } from "./components/viewer-container";
-import type { TrackViewerLabels } from "./i18n/labels";
-import type { MeasurementUnitSystem } from "./types";
-import type { ViewerDesign } from "./snapshot/types";
-import type { AssetResolver } from "./assets/asset-url";
 import TrackViewer2D from "./viewer-2d/TrackViewer2D";
+import type { TrackDrawViewerOptions } from "./viewer-options";
 
 const TrackViewer3D = lazy(() => import("./viewer-3d/TrackViewer3D"));
-
-export type ViewerView = "2d" | "3d";
-
-export interface ViewerViewState {
-  view: ViewerView;
-  available3D: boolean;
-}
-
-export interface TrackViewerProps {
-  design: ViewerDesign;
-  initialView?: ViewerView;
-  /** Controlled mode for hosts that provide their own view buttons. */
-  view?: ViewerView;
-  showViewControls?: boolean;
-  onViewChange?: (view: ViewerView) => void;
-  /** Reports the effective mode, including WebGL fallback. */
-  onViewStateChange?: (state: ViewerViewState) => void;
-  assetsBaseUrl?: string;
-  /** Overrides assetsBaseUrl, for example with validated archive object URLs. */
-  assetResolver?: AssetResolver;
-  unitSystem?: MeasurementUnitSystem;
-  theme?: "light" | "dark";
-  labels?: Partial<TrackViewerLabels["canvasOverlay"]>;
-  showObstacleNumbers?: boolean;
-  /** Test-only: force the WebGL-unsupported fallback path. */
-  forceWebglUnsupported?: boolean;
-}
 
 export function TrackViewer({
   design,
@@ -54,7 +24,7 @@ export function TrackViewer({
   labels,
   showObstacleNumbers,
   forceWebglUnsupported = false,
-}: TrackViewerProps) {
+}: TrackDrawViewerOptions) {
   const webglSupported = useWebglSupport(forceWebglUnsupported) === "supported";
   const [failed3D, setFailed3D] = useState(false);
   const [internalView, setView] = useState(initialView);

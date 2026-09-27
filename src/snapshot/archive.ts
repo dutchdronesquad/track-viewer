@@ -30,7 +30,7 @@ function checkedSnapshot(value: unknown): ViewerDesignSnapshot {
     })
   )
     throw new Error(
-      "This course requires an unsupported viewer version or capability."
+      "This track requires an unsupported viewer version or capability."
     );
   const expected = getDesignAssetManifest(snapshot.design.shapes);
   if (
@@ -41,10 +41,10 @@ function checkedSnapshot(value: unknown): ViewerDesignSnapshot {
     })
   )
     throw new Error(
-      "Course asset manifest does not match the installed catalog."
+      "Track asset manifest does not match the installed catalog."
     );
   if (snapshot.snapshotId !== getViewerSnapshotId(snapshot))
-    throw new Error("Course content hash does not match its snapshot ID.");
+    throw new Error("Track content hash does not match its snapshot ID.");
   return snapshot;
 }
 
@@ -54,7 +54,7 @@ function checkAsset(asset: ViewerAssetManifestEntry, bytes: Uint8Array) {
     bytes.byteLength !== asset.sizeBytes ||
     sha256Hex(bytes) !== asset.sha256
   ) {
-    throw new Error(`Course asset failed integrity validation: ${asset.path}`);
+    throw new Error(`Track asset failed integrity validation: ${asset.path}`);
   }
 }
 
@@ -71,7 +71,7 @@ export async function createViewerArchive(
   for (const asset of snapshot.assets) {
     total += asset.sizeBytes;
     if (asset.sizeBytes > MAX_ASSET_BYTES || total > MAX_VIEWER_ARCHIVE_BYTES)
-      throw new Error("Course archive is too large.");
+      throw new Error("Track archive is too large.");
     const bytes = await readAsset(asset);
     checkAsset(asset, bytes);
     files[asset.path.slice(1)] = bytes;
@@ -79,7 +79,7 @@ export async function createViewerArchive(
   // Already-compressed images use STORE; this also keeps browser export responsive.
   const archive = zipSync(files, { level: 0 });
   if (archive.byteLength > MAX_VIEWER_ARCHIVE_BYTES)
-    throw new Error("Course archive is too large.");
+    throw new Error("Track archive is too large.");
   return archive;
 }
 
@@ -96,7 +96,7 @@ export async function createViewerArchiveWithCurrentAssets(
     const bytes = await readAsset(asset);
     total += bytes.byteLength;
     if (bytes.byteLength > MAX_ASSET_BYTES || total > MAX_VIEWER_ARCHIVE_BYTES)
-      throw new Error("Course archive is too large.");
+      throw new Error("Track archive is too large.");
     content.set(asset.path, bytes);
     assets.push({
       ...asset,
@@ -114,7 +114,7 @@ export async function createViewerArchiveWithCurrentAssets(
 /** Validate before exposing any files. Reject traversal, duplicates, extra entries and zip bombs. */
 export function readViewerArchive(bytes: Uint8Array): ViewerArchive {
   if (bytes.byteLength > MAX_VIEWER_ARCHIVE_BYTES)
-    throw new Error("Course archive is too large.");
+    throw new Error("Track archive is too large.");
   const names = new Set<string>();
   let total = 0;
   const files = unzipSync(bytes, {
@@ -126,7 +126,7 @@ export function readViewerArchive(bytes: Uint8Array): ViewerArchive {
             file.name
           ))
       ) {
-        throw new Error("Invalid or duplicate course archive path.");
+        throw new Error("Invalid or duplicate track archive path.");
       }
       names.add(file.name);
       total += file.originalSize;
@@ -135,21 +135,21 @@ export function readViewerArchive(bytes: Uint8Array): ViewerArchive {
           ? MAX_VIEWER_SNAPSHOT_BYTES
           : MAX_ASSET_BYTES;
       if (file.originalSize > limit || total > MAX_VIEWER_ARCHIVE_BYTES)
-        throw new Error("Course archive is too large.");
+        throw new Error("Track archive is too large.");
       return true;
     },
   });
   if (!files["snapshot.json"])
-    throw new Error("Course archive is missing snapshot.json.");
+    throw new Error("Track archive is missing snapshot.json.");
   const snapshot = checkedSnapshot(
     JSON.parse(strFromU8(files["snapshot.json"]))
   );
   if (names.size !== snapshot.assets.length + 1)
-    throw new Error("Course archive contains unexpected files.");
+    throw new Error("Track archive contains unexpected files.");
   const assets = new Map<string, Uint8Array>();
   for (const asset of snapshot.assets) {
     const content = files[asset.path.slice(1)];
-    if (!content) throw new Error(`Course archive is missing ${asset.path}.`);
+    if (!content) throw new Error(`Track archive is missing ${asset.path}.`);
     checkAsset(asset, content);
     assets.set(asset.path, content);
   }
@@ -164,7 +164,7 @@ export function createViewerArchiveAssets(archive: ViewerArchive): {
   const urls = new Map<string, string>();
   for (const asset of archive.snapshot.assets) {
     const bytes = archive.assets.get(asset.path);
-    if (!bytes) throw new Error(`Course archive is missing ${asset.path}.`);
+    if (!bytes) throw new Error(`Track archive is missing ${asset.path}.`);
     urls.set(
       asset.path,
       URL.createObjectURL(
@@ -175,7 +175,7 @@ export function createViewerArchiveAssets(archive: ViewerArchive): {
   return {
     assetResolver(path) {
       const url = urls.get(path);
-      if (!url) throw new Error(`Course asset is unavailable: ${path}`);
+      if (!url) throw new Error(`Track asset is unavailable: ${path}`);
       return url;
     },
     dispose() {

@@ -1,24 +1,22 @@
 import { createElement } from "react";
 import { createRoot, type Root } from "react-dom/client";
-import { TrackViewer, type TrackViewerProps } from "./TrackViewer";
+import { TrackViewer } from "./TrackViewer";
+import type { TrackDrawViewerOptions } from "./viewer-options";
 
 export interface TrackDrawViewerHandle {
   /** Re-renders with new options (e.g. after refreshing a snapshot). */
-  update(options: TrackViewerProps): void;
+  update(options: TrackDrawViewerOptions): void;
   /** Unmounts and releases the React root. */
   destroy(): void;
 }
 
 /**
- * Vanilla mount API for hosts without their own React tree (e.g. a plain
- * <script> consumer such as a future RotorHazard plugin). Internally just
- * wraps ReactDOM.createRoot + <TrackViewer/> - this is the static build's
- * entry point, and is also re-exported from ./index.ts for React/npm
- * consumers who prefer an imperative API.
+ * Mount a read-only viewer in a host-owned container. The published build
+ * includes its own rendering runtime and needs no React installation.
  */
 export function createTrackDrawViewer(
   container: HTMLElement,
-  options: TrackViewerProps
+  options: TrackDrawViewerOptions
 ): TrackDrawViewerHandle {
   const root: Root = createRoot(container);
   root.render(createElement(TrackViewer, options));
