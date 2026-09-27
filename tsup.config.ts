@@ -1,9 +1,9 @@
 import { defineConfig } from "tsup";
 
+// The build script cleans dist once before these parallel builds start.
 export default defineConfig([
-  // ESM npm build. Multi-entry so app-side/server code (e.g.
-  // src/lib/track/viewer-snapshot.ts) can import light subpaths without
-  // pulling React/three/konva into a server bundle.
+  // Standalone ESM runtime. Snapshot/asset entries remain independent of
+  // the renderer, while mount/index include their own React runtime.
   {
     entry: {
       index: "src/index.ts",
@@ -31,11 +31,13 @@ export default defineConfig([
     // repo split.
     dts: false,
     sourcemap: true,
-    clean: true,
+    clean: false,
     outDir: "dist",
     platform: "browser",
     tsconfig: "./tsconfig.json",
-    external: ["react", "react-dom", "react-dom/client"],
+    noExternal: [/.*/],
+    minify: true,
+    define: { "process.env.NODE_ENV": '"production"' },
   },
   // Static browser build: a single self-contained global script for hosts
   // with no npm/bundler (e.g. a future RotorHazard plugin). React itself
@@ -44,6 +46,8 @@ export default defineConfig([
     entry: { "trackdraw-viewer": "src/static.ts" },
     format: ["iife"],
     globalName: "TrackDrawViewer",
+    clean: false,
+    define: { "process.env.NODE_ENV": '"production"' },
     outDir: "dist/static",
     platform: "browser",
     minify: true,

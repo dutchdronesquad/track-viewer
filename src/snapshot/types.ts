@@ -1,6 +1,6 @@
 import type { Shape } from "../lib/types";
 
-/** Portable public course contract shared by validation, archives and rendering. */
+/** Portable public track contract shared by validation, archives and rendering. */
 export const VIEWER_SNAPSHOT_SCHEMA = "trackdraw.viewer-snapshot.v1" as const;
 
 export interface RequiredViewer {

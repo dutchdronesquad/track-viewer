@@ -1,95 +1,100 @@
-# @trackdraw/viewer
+# TrackDraw Viewer
 
-Framework-neutral 2D/3D track viewer for TrackDraw course designs. `TrackViewer` takes a portable `ViewerDesign` as its `design` prop and has no dependency on any editor state, `next-intl`, or `next/navigation` — this package builds, tests, and lints entirely standalone.
+Embed interactive 2D and 3D FPV race tracks in your website or application. **@trackdraw/viewer** renders portable [TrackDraw](https://trackdraw.app) track designs in a read-only viewer, with a plain JavaScript API and support for offline track archives.
 
-Licensed Apache-2.0 (see [LICENSE](LICENSE)/[NOTICE.md](NOTICE.md)) — deliberately more permissive than [`dutchdronesquad/trackdraw`](https://github.com/dutchdronesquad/trackdraw)'s `AGPL-3.0-only` editor/server, so hosts such as FPVScores or RotorHazard can depend on it without AGPL's copyleft obligations reaching their own codebase.
+- **2D and 3D views** with per-instance themes, measurement units, labels, and obstacle numbering.
+- **Portable track data** with validation and renderer compatibility checks.
+- **Offline viewing** from `.tdviewer.zip` archives containing a track and its catalog textures.
+- **Self-contained integration** with scoped styles and no TrackDraw account or editor state required.
 
-## History
+## Installation
 
-This package started life inside the trackdraw monorepo at `packages/viewer/` and moved here once it was fully self-contained:
-
-- Phase 1 ([trackdraw#859](https://github.com/dutchdronesquad/trackdraw/issues/859)) proved extraction, finalized the display-metadata allowlist (`src/snapshot/`), and fixed the eager whole-catalog texture preload.
-- Phase 2 ([trackdraw#860](https://github.com/dutchdronesquad/trackdraw/issues/860)) added `package.json`, the ESM + static builds, the asset manifest (`src/assets/manifest.ts`), schema-validated snapshots (`src/snapshot/schema.ts`), and the shared snapshot builder's first real callers in the app.
-- [trackdraw#870](https://github.com/dutchdronesquad/trackdraw/issues/870) vendored the package's remaining app-internal dependencies (2D/3D catalog rendering, geometry, and shape utilities) into `src/lib/` and `src/components/`, so `src/**` had zero remaining imports into the app.
-- [trackdraw#871](https://github.com/dutchdronesquad/trackdraw/issues/871) split this directory out into its own repository (`dutchdronesquad/track-viewer`), preserving its git history, with its own CI and a single root `LICENSE` instead of per-file headers.
-
-## Development
+For an application with a JavaScript bundler:
 
 ```sh
-npm install
-npm run typecheck
-npm run lint
-npm run test
-npm run build
+npm install @trackdraw/viewer
 ```
 
-Install with `npm install @trackdraw/viewer`. Stable GitHub Releases publish to npm through `.github/workflows/publish.yml`; see [publishing](docs/publishing.md).
+No separate React installation is needed. Import the viewer stylesheet once; no Tailwind configuration is required in the host application.
 
-## Builds
+For a site without a bundler, use the [plain HTML integration](#plain-html).
 
-`npm run build` produces:
+## Quick start
 
-- `dist/*.js` — ESM build, multi-entry (`.`, `./mount`, `./snapshot/*`, `./assets/*`) so server code can import light subpaths without pulling in React/three/konva.
-- `dist/static/trackdraw-viewer.global.js` + `dist/static/trackdraw-viewer.css` — a self-contained IIFE bundle (`window.TrackDrawViewer`) plus a compiled Tailwind stylesheet, for hosts with no npm/bundler of their own (e.g. a future RotorHazard plugin). Load both:
-  ```html
-  <link rel="stylesheet" href=".../trackdraw-viewer.css" />
-  <script src=".../trackdraw-viewer.global.js"></script>
-  <script>
-    const handle = TrackDrawViewer.createTrackDrawViewer(container, { design });
-  </script>
-  ```
-- ESM/React consumers use `createTrackDrawViewer` (or the `<TrackViewer/>` component) from `@trackdraw/viewer` and import `@trackdraw/viewer/static/trackdraw-viewer.css`. No host Tailwind setup is needed. All generated selectors and theme tokens are scoped to `.trackdraw-viewer`; tooltip portals stay inside that instance.
-
-Type declarations (`dist/**/*.d.ts`) are emitted by a separate `tsc -p tsconfig.build.json` pass, not by `tsup`'s own `dts` option — `tsup`'s bundled copy of `rollup-plugin-dts` isn't compatible with this repo's TypeScript 7 (see the comment in `tsup.config.ts`). A plain `tsc --declaration` pass works because this package's `rootDir` no longer reaches outside its own `src/`, now that it's a standalone repository.
-
-**Vendored, not shared, source.** Files under `src/lib/` and `src/components/` originated as copies of pure/leaf logic from the trackdraw app (`src/lib/track/*`, `src/components/canvas/*`, `src/hooks/*`) — not re-exports or a shared module. They will not automatically pick up future changes to trackdraw's originals; keep them in sync manually if the app's copy changes in a way that matters for rendering fidelity. A few app-only exports were intentionally dropped during vendoring (e.g. `design.ts`'s serialize/normalize/create functions, which pulled in map-reference and inventory-planning code this read-only viewer never needs) — see the file-level comments on the trimmed copies.
-
-**Catalog texture bytes are not bundled.** Online viewers load MultiGP textures from `https://obstacles.trackdraw.app/multigp/<filename>.webp` by default. Explicit `assetsBaseUrl` (including an empty string) or `assetResolver` overrides this for local/offline hosting. Offline archives carry their own textures; the TrackDraw-owned watermark is embedded in the viewer so it does not make a network request. See [NOTICE.md](NOTICE.md).
-
-## Portable course contract
-
-`ViewerDesignSnapshot.design` is accepted directly by both `TrackViewer` and the mount API. It contains `version: 2`, `title`, `field`, `shapes`, and `updatedAt`; editor storage, inventory, ownership, and account data are not required. Validate untrusted JSON with `validateViewerDesignSnapshot` before rendering. Validation requires each shape kind's geometry, strips unknown fields, limits counts/dimensions and rejects duplicate IDs. `isViewerCompatible` checks the renderer floor and required capabilities separately.
-
-TrackDraw's REST API retains its existing snake_case response. Pass its `response.data` through `viewerSnapshotFromApi` (also exported at `./snapshot/api`) to obtain the same camelCase snapshot as a local export; private project provenance is stripped. Do not pass raw API shapes directly to the renderer.
-
-`getViewerSnapshotId` computes a deterministic SHA-256 identifier from validated public content. Property insertion order and asset/capability ordering do not change the ID. Geometry, display metadata, source update time and asset hashes do. Build the snapshot, validate it, then set `snapshotId` to this ID.
-
-Online texture URLs are stable and may receive compatible artwork updates independently of viewer releases. Snapshot asset hashes describe a captured revision, not a runtime pin on the online host.
-
-## Offline course archives
-
-A `.tdviewer.zip` contains `snapshot.json` and exactly the texture files listed in its manifest, under `assets/...`. It contains no executable code. The viewer's static script/CSS must be installed separately on the host. MultiGP images are included only for the course that uses them, not redistributed inside this npm package.
+The default API bundles its own rendering runtime. Your application does not need React:
 
 ```ts
-import { createTrackDrawViewer } from "@trackdraw/viewer/mount";
-import {
-  readViewerArchive,
-  createViewerArchiveAssets,
-} from "@trackdraw/viewer/snapshot/archive";
+import { createTrackDrawViewer } from "@trackdraw/viewer";
 import "@trackdraw/viewer/static/trackdraw-viewer.css";
 
-const archive = readViewerArchive(new Uint8Array(await file.arrayBuffer()));
-const assets = createViewerArchiveAssets(archive);
+// container is an HTMLElement with an explicit width and height.
+// snapshot is a validated, compatible viewer snapshot.
 const viewer = createTrackDrawViewer(container, {
-  design: archive.snapshot.design,
-  assetResolver: assets.assetResolver,
+  design: snapshot.design,
   theme: "light",
 });
-// When removing the preview:
+
+// Supply the complete options when updating the viewer.
+viewer.update({ design: nextSnapshot.design, theme: "light" });
+
+// Release resources when removing the preview.
 viewer.destroy();
-assets.dispose();
 ```
 
-The static global exposes the same archive reader/object-URL helper alongside `createTrackDrawViewer`. See [the plain HTML example](examples/static.html). For persistent hosting, store the verified archive files locally and use `assetsBaseUrl` pointing at their parent directory instead of temporary object URLs. Complete validation before replacing an existing event attachment.
+## Plain HTML
 
-`createViewerArchiveWithCurrentAssets(snapshot, readAsset)` captures the current approved texture bytes and updates the archive manifest and snapshot ID. Use it when exporting from the live asset host; old archives remain readable and retain their own byte-integrity checks.
+Copy `dist/static/trackdraw-viewer.global.js` and `dist/static/trackdraw-viewer.css` from the installed package to your site's public files. The JavaScript bundle includes React and its other JavaScript dependencies.
 
-`createViewerArchive(snapshot, readAsset)` lets browser exports and backend API adapters build the same archive. It never fetches implicitly: the caller supplies approved local bytes or an approved fetcher. It verifies catalog manifest completeness, renderer compatibility, stable snapshot identity, sizes and SHA-256 hashes before returning bytes. Import rejects missing, extra, duplicate and unsafe paths, unsupported courses, corrupt assets, and oversized archives (4 MB snapshot, 8 MB per asset, 64 MB archive/expanded total). Hashes check integrity, not authorship. V1 supports the installed catalog assets only; user-uploaded imagery/maps are outside this contract.
+```html
+<link rel="stylesheet" href="/vendor/trackdraw-viewer.css" />
+<div id="track" style="height: 420px; width: 100%"></div>
+<script src="/vendor/trackdraw-viewer.global.js"></script>
+<script>
+  // Provide a validated, compatible viewer snapshot from your application.
+  const viewer = TrackDrawViewer.createTrackDrawViewer(
+    document.getElementById("track"),
+    { design: snapshot.design, theme: "light" }
+  );
+  window.addEventListener("pagehide", () => viewer.destroy());
+</script>
+```
 
-## Runtime and lifecycle
+See the [complete HTML example](https://github.com/dutchdronesquad/track-viewer/blob/main/examples/static.html) for archive upload, validation, error handling, and cleanup.
 
-Provide an explicitly sized container, e.g. `height: 420px; width: 100%`. Each viewer owns its theme and viewport; no host-wide reset, storage, account calls or analytics are installed. Choose `theme`, `unitSystem`, `labels`, `initialView`, and `showObstacleNumbers` per instance. `assetResolver` overrides `assetsBaseUrl` when supplied.
+## Track data
 
-2D-only instances do not mount a WebGL renderer or load 3D textures. Once visited, a hidden 3D scene pauses its frame loop while retaining its camera. 3D requires WebGL2; unavailable or failed initialization/context loss leaves the existing 2D view usable. `destroy()` unmounts the React root and releases instance resources. The watermark is embedded and requires no CDN CORS configuration; externally hosted catalog textures still require the asset host to permit CORS.
+A viewer snapshot contains the track geometry, display metadata, required renderer capabilities, and an asset manifest. It does not require editor storage, inventory, ownership, or account data.
 
-Use a modern browser with ES modules, ResizeObserver, and CSS nesting support; WebGL2 is optional. The static artifact bundles React and all JavaScript dependencies. ESM users provide the declared React peers and a bundler that resolves the package dependencies/chunks. Serve the static JavaScript and CSS locally for cold offline use.
+For imported JSON, use `validateViewerDesignSnapshot` from `@trackdraw/viewer/snapshot/schema`, then check `isViewerCompatible` from `@trackdraw/viewer/snapshot/version` before rendering. Validation and renderer compatibility are separate checks.
+
+For TrackDraw REST API responses, pass `response.data` through `viewerSnapshotFromApi` from `@trackdraw/viewer/snapshot/api`. Raw API shapes use a different format and should not be passed directly to the viewer.
+
+The [integration guide](https://github.com/dutchdronesquad/track-viewer/blob/main/docs/integration.md) covers validation, compatibility, snapshot identity, and archive creation.
+
+## Offline viewing and assets
+
+A `.tdviewer.zip` archive carries `snapshot.json` and the catalog textures used by that track. Load it with `readViewerArchive`, then use `createViewerArchiveAssets` to provide an `assetResolver` to the viewer. Dispose of the asset URLs after destroying the viewer. The [integration guide](https://github.com/dutchdronesquad/track-viewer/blob/main/docs/integration.md#offline-track-archives) includes a complete example.
+
+Install the viewer JavaScript and CSS locally for offline use; archives contain data and images, not executable code. User-uploaded imagery and maps are outside the current archive format.
+
+Online catalog textures load from `https://obstacles.trackdraw.app` by default. Set `assetsBaseUrl` or `assetResolver` to use your own local assets; `assetResolver` takes precedence. Third-party catalog textures are not bundled in the npm package. The TrackDraw watermark is embedded and requires no network request.
+
+## Browser support
+
+Use a modern browser with ES modules, ResizeObserver, and CSS nesting support. The 3D view requires WebGL2; the 2D view remains available when WebGL2 is unavailable or 3D initialization fails.
+
+Each viewer owns its theme and viewport. Styles are scoped to the viewer, and the package does not install account calls, analytics, or persistent browser storage. A 2D-only viewer does not mount a WebGL renderer or load 3D textures.
+
+## Migrating from the previous entry point
+
+The package now exposes the standalone mount API instead of a public `<TrackViewer />` component. React applications can call `createTrackDrawViewer` from an effect and call `destroy()` in its cleanup. Existing `@trackdraw/viewer/mount` and snapshot/asset imports continue to work. Replace the old `TrackViewerProps` type with `TrackDrawViewerOptions`, or derive the options with `Parameters<typeof createTrackDrawViewer>[1]`.
+
+## Development and support
+
+See [Contributing](https://github.com/dutchdronesquad/track-viewer/blob/main/CONTRIBUTING.md) for local setup, validation commands, and dependency maintenance, and [Publishing](https://github.com/dutchdronesquad/track-viewer/blob/main/docs/publishing.md) for the release workflow.
+
+Report bugs or request features in [GitHub Issues](https://github.com/dutchdronesquad/track-viewer/issues). For rendering problems, include the viewer version, browser, and a minimal track that reproduces the issue.
+
+## License
+
+[Apache-2.0](LICENSE). See [NOTICE.md](NOTICE.md) for attribution and third-party asset information.
