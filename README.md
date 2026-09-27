@@ -85,10 +85,6 @@ Use a modern browser with ES modules, ResizeObserver, and CSS nesting support. T
 
 Each viewer owns its theme and viewport. Styles are scoped to the viewer, and the package does not install account calls, analytics, or persistent browser storage. A 2D-only viewer does not mount a WebGL renderer or load 3D textures.
 
-## Migrating to v1.0.0
-
-The package now exposes the standalone mount API instead of a public `<TrackViewer />` component. React applications can call `createTrackDrawViewer` from an effect and call `destroy()` in its cleanup. Existing `@trackdraw/viewer/mount` and snapshot/asset imports continue to work. Replace the old `TrackViewerProps` type with `TrackDrawViewerOptions`, or derive the options with `Parameters<typeof createTrackDrawViewer>[1]`.
-
 ## Development and support
 
 See [Contributing](https://github.com/dutchdronesquad/track-viewer/blob/main/CONTRIBUTING.md) for local setup, validation commands, and dependency maintenance, and [Publishing](https://github.com/dutchdronesquad/track-viewer/blob/main/docs/publishing.md) for the release workflow.
