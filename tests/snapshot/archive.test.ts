@@ -3,6 +3,7 @@ import { zipSync, unzipSync, strToU8 } from "fflate";
 import * as manifest from "../../src/assets/manifest";
 import {
   createViewerArchive,
+  createViewerArchiveWithCurrentAssets,
   readViewerArchive,
 } from "../../src/snapshot/archive";
 import { getViewerSnapshotId, sha256Hex } from "../../src/snapshot/identity";
@@ -110,4 +111,37 @@ it("adapts the legacy REST envelope and strips project provenance", () => {
       type: "viewer_snapshot",
     })
   ).toEqual(snapshot);
+});
+
+it("captures changed hosted textures and retains offline integrity", async () => {
+  const { snapshot } = texturedFixture();
+  const changed = new Uint8Array([4, 5, 6, 7]);
+  const archiveBytes = await createViewerArchiveWithCurrentAssets(
+    snapshot,
+    async () => changed
+  );
+  const archive = readViewerArchive(archiveBytes);
+  expect(archive.snapshot.snapshotId).not.toBe(snapshot.snapshotId);
+  expect(archive.snapshot.assets[0].sha256).toBe(sha256Hex(changed));
+  expect(archive.assets.get("/assets/test.webp")).toEqual(changed);
+  const files = unzipSync(archiveBytes);
+  files["assets/test.webp"] = new Uint8Array([8, 8, 8, 8]);
+  expect(() => readViewerArchive(zipSync(files))).toThrow(/integrity/);
+});
+
+it("rejects oversized current assets and unexpected catalog paths", async () => {
+  const { snapshot } = texturedFixture();
+  await expect(
+    createViewerArchiveWithCurrentAssets(
+      snapshot,
+      async () => new Uint8Array(8_000_001)
+    )
+  ).rejects.toThrow(/large/);
+  snapshot.assets = [
+    { ...snapshot.assets[0], path: "/assets/unexpected.webp" },
+  ];
+  snapshot.snapshotId = getViewerSnapshotId(snapshot);
+  await expect(
+    createViewerArchiveWithCurrentAssets(snapshot, async () => new Uint8Array())
+  ).rejects.toThrow(/catalog/);
 });

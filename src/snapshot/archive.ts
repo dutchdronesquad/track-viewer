@@ -37,12 +37,7 @@ function checkedSnapshot(value: unknown): ViewerDesignSnapshot {
     snapshot.assets.length !== expected.length ||
     expected.some((entry) => {
       const actual = snapshot.assets.find((asset) => asset.path === entry.path);
-      return (
-        !actual ||
-        actual.sha256 !== entry.sha256 ||
-        actual.sizeBytes !== entry.sizeBytes ||
-        actual.contentType !== entry.contentType
-      );
+      return !actual || actual.contentType !== entry.contentType;
     })
   )
     throw new Error(
@@ -86,6 +81,34 @@ export async function createViewerArchive(
   if (archive.byteLength > MAX_VIEWER_ARCHIVE_BYTES)
     throw new Error("Course archive is too large.");
   return archive;
+}
+
+/** Capture current approved asset bytes for an offline export without pinning the online catalog. */
+export async function createViewerArchiveWithCurrentAssets(
+  value: unknown,
+  readAsset: (asset: ViewerAssetManifestEntry) => Promise<Uint8Array>
+): Promise<Uint8Array> {
+  const snapshot = checkedSnapshot(value);
+  const content = new Map<string, Uint8Array>();
+  const assets: ViewerAssetManifestEntry[] = [];
+  let total = 0;
+  for (const asset of snapshot.assets) {
+    const bytes = await readAsset(asset);
+    total += bytes.byteLength;
+    if (bytes.byteLength > MAX_ASSET_BYTES || total > MAX_VIEWER_ARCHIVE_BYTES)
+      throw new Error("Course archive is too large.");
+    content.set(asset.path, bytes);
+    assets.push({
+      ...asset,
+      sizeBytes: bytes.byteLength,
+      sha256: sha256Hex(bytes),
+    });
+  }
+  const refreshed = { ...snapshot, assets };
+  refreshed.snapshotId = getViewerSnapshotId(refreshed);
+  return createViewerArchive(refreshed, async (asset) =>
+    content.get(asset.path)!
+  );
 }
 
 /** Validate before exposing any files. Reject traversal, duplicates, extra entries and zip bombs. */

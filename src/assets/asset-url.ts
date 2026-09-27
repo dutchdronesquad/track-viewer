@@ -1,13 +1,20 @@
 export type AssetResolver = (path: string) => string;
 
-/**
- * Prefixes catalog asset paths (still stored as absolute-from-origin
- * strings, e.g. "/assets/models/textures/...") so they resolve correctly
- * when the viewer is hosted under a non-root URL prefix.
- */
-export function createAssetResolver(baseUrl = ""): AssetResolver {
-  const trimmed = baseUrl.replace(/\/+$/, "");
-  return (path: string) => `${trimmed}${path}`;
+export const OBSTACLE_ASSETS_URL = "https://obstacles.trackdraw.app";
+
+/** Resolve legacy catalog identifiers to hosted textures; explicit bases keep local/offline hosting. */
+export function createAssetResolver(baseUrl?: string): AssetResolver {
+  if (baseUrl !== undefined) {
+    const trimmed = baseUrl.replace(/\/+$/, "");
+    return (path) => `${trimmed}${path}`;
+  }
+  return (path) => {
+    const match =
+      /^\/assets\/models\/textures\/multigp-obstacles\/([a-zA-Z0-9_-]+\.webp)$/.exec(
+        path
+      );
+    return match ? `${OBSTACLE_ASSETS_URL}/multigp/${match[1]}` : path;
+  };
 }
 
 export const IDENTITY_ASSET_RESOLVER: AssetResolver = (path) => path;

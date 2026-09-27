@@ -64,7 +64,7 @@ const TrackViewer3D = forwardRef<TrackViewer3DHandle, TrackViewer3DProps>(
       design,
       theme = "light",
       showGizmo = true,
-      assetsBaseUrl = "",
+      assetsBaseUrl,
       assetResolver: resolveAsset,
       active = true,
       onUnavailable,

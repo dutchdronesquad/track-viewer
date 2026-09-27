@@ -23,7 +23,7 @@ npm run test
 npm run build
 ```
 
-**First npm publication pending.** Stable GitHub Releases publish through `.github/workflows/publish.yml` after building. Follow the [first-publication checklist](docs/publishing.md#first-publication-maintainer-checklist) to set up the npm organization, temporary first-release token and trusted publishing. The same guide covers subsequent releases. Until the first successful publication, TrackDraw continues to pin a git dependency.
+Install with `npm install @trackdraw/viewer`. Stable GitHub Releases publish to npm through `.github/workflows/publish.yml`; see [publishing](docs/publishing.md).
 
 ## Builds
 
@@ -44,7 +44,7 @@ Type declarations (`dist/**/*.d.ts`) are emitted by a separate `tsc -p tsconfig.
 
 **Vendored, not shared, source.** Files under `src/lib/` and `src/components/` originated as copies of pure/leaf logic from the trackdraw app (`src/lib/track/*`, `src/components/canvas/*`, `src/hooks/*`) — not re-exports or a shared module. They will not automatically pick up future changes to trackdraw's originals; keep them in sync manually if the app's copy changes in a way that matters for rendering fidelity. A few app-only exports were intentionally dropped during vendoring (e.g. `design.ts`'s serialize/normalize/create functions, which pulled in map-reference and inventory-planning code this read-only viewer never needs) — see the file-level comments on the trimmed copies.
 
-**Catalog texture bytes are not bundled.** MultiGP textures travel in each course archive; the TrackDraw-owned watermark is embedded in the viewer so it does not make a network request. See [NOTICE.md](NOTICE.md).
+**Catalog texture bytes are not bundled.** Online viewers load MultiGP textures from `https://obstacles.trackdraw.app/multigp/<filename>.webp` by default. Explicit `assetsBaseUrl` (including an empty string) or `assetResolver` overrides this for local/offline hosting. Offline archives carry their own textures; the TrackDraw-owned watermark is embedded in the viewer so it does not make a network request. See [NOTICE.md](NOTICE.md).
 
 ## Portable course contract
 
@@ -53,6 +53,8 @@ Type declarations (`dist/**/*.d.ts`) are emitted by a separate `tsc -p tsconfig.
 TrackDraw's REST API retains its existing snake_case response. Pass its `response.data` through `viewerSnapshotFromApi` (also exported at `./snapshot/api`) to obtain the same camelCase snapshot as a local export; private project provenance is stripped. Do not pass raw API shapes directly to the renderer.
 
 `getViewerSnapshotId` computes a deterministic SHA-256 identifier from validated public content. Property insertion order and asset/capability ordering do not change the ID. Geometry, display metadata, source update time and asset hashes do. Build the snapshot, validate it, then set `snapshotId` to this ID.
+
+Online texture URLs are stable and may receive compatible artwork updates independently of viewer releases. Snapshot asset hashes describe a captured revision, not a runtime pin on the online host.
 
 ## Offline course archives
 
@@ -79,6 +81,8 @@ assets.dispose();
 ```
 
 The static global exposes the same archive reader/object-URL helper alongside `createTrackDrawViewer`. See [the plain HTML example](examples/static.html). For persistent hosting, store the verified archive files locally and use `assetsBaseUrl` pointing at their parent directory instead of temporary object URLs. Complete validation before replacing an existing event attachment.
+
+`createViewerArchiveWithCurrentAssets(snapshot, readAsset)` captures the current approved texture bytes and updates the archive manifest and snapshot ID. Use it when exporting from the live asset host; old archives remain readable and retain their own byte-integrity checks.
 
 `createViewerArchive(snapshot, readAsset)` lets browser exports and backend API adapters build the same archive. It never fetches implicitly: the caller supplies approved local bytes or an approved fetcher. It verifies catalog manifest completeness, renderer compatibility, stable snapshot identity, sizes and SHA-256 hashes before returning bytes. Import rejects missing, extra, duplicate and unsafe paths, unsupported courses, corrupt assets, and oversized archives (4 MB snapshot, 8 MB per asset, 64 MB archive/expanded total). Hashes check integrity, not authorship. V1 supports the installed catalog assets only; user-uploaded imagery/maps are outside this contract.
 

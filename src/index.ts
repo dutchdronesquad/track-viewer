@@ -16,6 +16,7 @@ export {
 export { detectWebglSupport, type WebglSupport } from "./capabilities/webgl";
 export {
   createAssetResolver,
+  OBSTACLE_ASSETS_URL,
   IDENTITY_ASSET_RESOLVER,
   type AssetResolver,
 } from "./assets/asset-url";
@@ -51,6 +52,7 @@ export { viewerSnapshotFromApi } from "./snapshot/api";
 export { getViewerSnapshotId } from "./snapshot/identity";
 export {
   createViewerArchive,
+  createViewerArchiveWithCurrentAssets,
   readViewerArchive,
   createViewerArchiveAssets,
   type ViewerArchive,

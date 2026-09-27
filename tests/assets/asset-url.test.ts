@@ -34,3 +34,21 @@ describe("IDENTITY_ASSET_RESOLVER", () => {
     );
   });
 });
+
+it("loads MultiGP textures from stable hosted URLs by default", () => {
+  const path =
+    "/assets/models/textures/multigp-obstacles/large-top-multigp.webp";
+  expect(createAssetResolver()(path)).toBe(
+    "https://obstacles.trackdraw.app/multigp/large-top-multigp.webp"
+  );
+  expect(createAssetResolver("")(path)).toBe(path);
+  expect(createAssetResolver("/offline")(path)).toBe(`/offline${path}`);
+  expect(createAssetResolver()("https://example.com/custom.webp")).toBe(
+    "https://example.com/custom.webp"
+  );
+  expect(
+    createAssetResolver()(
+      "/assets/models/textures/multigp-obstacles/../secret.webp"
+    )
+  ).toContain("/../");
+});
