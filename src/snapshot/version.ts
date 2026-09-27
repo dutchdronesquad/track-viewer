@@ -18,6 +18,7 @@ export const RENDERER_CAPABILITIES = [
   "shape:barrier",
   "catalog:trackdraw",
   "catalog:multigp",
+  "catalog:racegow",
 ] as const;
 
 // Unreleased checkouts use the original renderer baseline for compatibility.
