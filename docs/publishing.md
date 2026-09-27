@@ -1,101 +1,63 @@
 # Publishing @trackdraw/viewer
 
-Part of [trackdraw#876](https://github.com/dutchdronesquad/trackdraw/issues/876). The first registry publication is still pending; adding this workflow alone does not complete the issue.
+Publish a stable GitHub Release to release the package to npm. The repository uses trusted publishing through GitHub Actions; normal releases do not require an npm token.
 
-## Release model
+## Release a version
 
-Keep `package.json` and `package-lock.json` at `0.0.0` in Git. Publish a GitHub Release tagged `vX.Y.Z`; that tag is the release version. No version-bump PR, release-please or Changesets setup is needed. Only a stable release's `published` event publishes to npm; draft releases, prereleases and tag pushes alone do not. `0.0.0` is reserved for development.
-
-The workflow validates the tag, uses `npm version --no-git-tag-version` in its temporary checkout, installs/builds with `npm ci`, then runs `npm publish`. The renderer reads the package version, so there is no separate source rewrite. The package's `publishConfig` selects the public npm registry and public access; npm uses `latest`. Runs are serialized without cancelling an active publish.
-
-Lint, formatting, typechecks and tests stay in the existing CI workflow. Publish releases only from reviewed commits with green CI; the publication workflow does not repeat or enforce those checks. `npm ci` builds through the existing `prepare` lifecycle; `npm publish --ignore-scripts` avoids building a second time.
-
-## Release drafts and labels
-
-The repository follows the [organization's GitHub defaults](https://github.com/dutchdronesquad/.github#readme):
-
-- `.github/workflows/release-drafter.yml` updates a draft after pushes to `main` and supports manual runs. With no local `.github/release-drafter.yml`, it inherits the organization's categories, version resolver and `v$RESOLVED_VERSION` tag template. Apply the appropriate shared PR labels so release notes and version suggestions are useful.
-- `.github/workflows/sync-labels.yml` uses Label Blueprint to read the organization's `.github/labels.yml` weekly and on manual runs. It preserves additional repository labels; no separate token is needed.
-
-After merging these workflows, run **Actions → Sync labels → Run workflow** on `main` once to populate the labels immediately. Later runs synchronize automatically. Release Drafter runs on the merge's push to `main`; **Actions → Release Drafter → Run workflow** can refresh the draft after correcting labels.
-
-Review the generated draft under **Releases**, check its target commit, tag and notes, then publish it. For the first release, explicitly choose `v0.1.0` rather than blindly accepting the suggested version. Creating/updating a draft does not publish to npm; publishing it triggers the existing npm workflow. Git's package version remains `0.0.0` throughout.
-
-## Why no separate publish action?
-
-We use the official `actions/setup-node` action and npm's own publish command. [`JS-DevTools/npm-publish`](https://github.com/JS-DevTools/npm-publish#readme) exists, but its maintainers recommend this direct approach for tag-based releases. Its extra version-detection logic is unnecessary here: our release tag already selects the version.
-
-## First publication: maintainer checklist
-
-These are manual npm/GitHub account steps. Merging this PR does not create an organization, configure authentication or publish a package. Keep credentials in account settings, never in this repository or a chat.
-
-### 1. Create or confirm the npm organization
-
-Sign in to [npm](https://www.npmjs.com/) using the maintainer's own account. From the profile menu choose **Add an Organization**, name it **trackdraw** (without `@`), and select the free **Unlimited public packages** plan. Agree within Dutch Drone Squad who owns/administers the organization and ensure the publishing account can publish under its scope. If the name is unavailable, resolve ownership before continuing; do not silently change the package name.
-
-The npm scope is `@trackdraw`; the GitHub organization is `dutchdronesquad`. They do not need the same name. See [npm organization setup](https://docs.npmjs.com/creating-an-organization/).
-
-### 2. Set up the first-publication token
-
-The intended steady state is trusted publishing. If the package does not exist yet and its publisher settings are unavailable, use a temporary token for the first release:
-
-1. In npm's profile menu, open **Access Tokens → Generate New Token**.
-2. Name it `track-viewer-first-publish`; choose a short expiration, for example one day.
-3. Under **Packages and scopes**, select **Read and write (publish and stage)** and restrict it to the `@trackdraw` scope. The new package cannot yet be selected individually. The token's account must already have publishing rights.
-4. Enable **Bypass two-factor authentication** for this CI token. Leave organization-management permissions at **No access**; those permissions do not grant package publishing rights.
-5. Copy the generated token into [track-viewer's Actions secrets](https://github.com/dutchdronesquad/track-viewer/settings/secrets/actions): **New repository secret**, name **NPM_TOKEN**.
-
-See [npm's token instructions](https://docs.npmjs.com/creating-and-viewing-access-tokens/). Do not use `GITHUB_TOKEN` for the npm registry.
-
-### 3. Publish the first release
-
-Merge the workflow and wait for green CI. Open [New GitHub release](https://github.com/dutchdronesquad/track-viewer/releases/new), create tag **v0.1.0** targeting the merged commit, add release notes, leave **pre-release** unchecked and publish.
-
-Watch **Publish to npm** in [Actions](https://github.com/dutchdronesquad/track-viewer/actions/workflows/publish.yml). Confirm the package at [npm](https://www.npmjs.com/package/@trackdraw/viewer) and run:
+1. Merge the intended changes and wait for **Linting** and **Tests** to pass on the commit you intend to release. The build job includes the packed-package installation checks.
+2. Open the generated draft under [GitHub Releases](https://github.com/dutchdronesquad/track-viewer/releases). Check its target commit, version tag, and notes. For the mount-only API release, use **v1.0.0** and include the migration notes below. Leave **pre-release** unchecked.
+3. Publish the release. This triggers [Publish to npm](https://github.com/dutchdronesquad/track-viewer/actions/workflows/publish.yml).
+4. After the workflow succeeds, verify the exact version in the registry and install it in a clean consumer:
 
 ```sh
-npm view @trackdraw/viewer@0.1.0 version dist.integrity
-```
+npm view @trackdraw/viewer@1.0.0 version dist.integrity
 
-Use a clean temporary project to check installation:
-
-```sh
 mkdir viewer-install-check
 cd viewer-install-check
 npm init -y
-npm install @trackdraw/viewer@0.1.0
+npm install @trackdraw/viewer@1.0.0
 ```
 
-### 4. Switch to trusted publishing
+For later releases, substitute the intended version. Confirm that the host can render a track, switch between 2D and 3D where WebGL2 is available, and remove the viewer cleanly. A GitHub Release alone does not prove npm publication or host integration succeeded.
 
-Once the package exists, open its **Settings → Trusted Publisher** on npm and select **GitHub Actions**. Enter:
+Keep `package.json` and `package-lock.json` at `0.0.0` in Git. The `vX.Y.Z` tag supplies the published version; no version-bump PR is needed. The publish workflow sets that version only in its temporary checkout, runs `npm ci` to install and build, then publishes with provenance. `npm publish --ignore-scripts` avoids building twice.
 
-| Field                     | Value                      |
-| ------------------------- | -------------------------- |
-| Organization or user      | `dutchdronesquad`          |
-| Repository                | `track-viewer`             |
-| Workflow filename         | `publish.yml`              |
-| Environment               | `release`                  |
-| Allowed actions, if shown | Allow direct `npm publish` |
+Only a stable release's `published` event publishes to npm. Drafts, prereleases, and tag pushes alone do not. The workflow does not repeat or enforce the quality checks, so choose a reviewed commit with green CI. Runs are serialized without cancelling an active publish.
 
-The publish job uses the GitHub Environment **release**. In [repository environment settings](https://github.com/dutchdronesquad/track-viewer/settings/environments), keep an environment with that exact name. Use `release` in npm's trusted-publisher configuration too: leaving it empty or using another name can cause OIDC authentication to fail. Keep **Allow direct publishing** enabled on npm so publishing a GitHub Release publishes directly to the registry.
+## v1.0.0 migration notes
 
-The environment is created without required reviewers or a wait timer, preserving automatic publication after the GitHub Release is published. Any protection rules added later will apply before the publish job starts. No additional npm login is needed for normal releases.
+Include these points in the release notes so consumers can upgrade deliberately:
 
-Save, remove the GitHub `NPM_TOKEN` secret and revoke the temporary token in npm. The next release uses OIDC; the workflow already has `id-token: write`, a GitHub-hosted runner and a compatible npm version. No new secret is needed. Configuration is not proof of a successful OIDC publish: verify the next genuine release's workflow and npm result. No empty test release is necessary.
+- The npm viewer bundles its rendering runtime and no longer requires React or React DOM peer dependencies.
+- The public `TrackViewer` React component has been removed. Use `createTrackDrawViewer(container, options)` and call `destroy()` when removing the preview.
+- Replace `TrackViewerProps` with `TrackDrawViewerOptions`, or derive it with `Parameters<typeof createTrackDrawViewer>[1]`.
+- The existing `/mount`, snapshot/asset subpaths, and stylesheet import remain available. Snapshot schema `trackdraw.viewer-snapshot.v1` and design version `2` are unchanged.
 
-See [npm trusted publishing](https://docs.npmjs.com/trusted-publishers/). If authentication fails, check those exact field values and the workflow log before changing anything else.
+Consumers pinned to `^0.2.0` or `^0.3.0` will not receive 1.0.0 automatically. Update their dependency ranges and lockfiles after publication, and run their own checks. See the [integration guide](integration.md) for the mount contract.
 
-## Each release
+## Trusted publishing configuration
 
-1. Merge the intended code changes after CI passes; leave both package manifests at `0.0.0`.
-2. In GitHub Releases, open the generated draft, check that it targets the merged commit and has the intended stable version tag, for example `v0.1.0`. Review the notes and publish the release. The tag's commit must contain this workflow.
-3. Check the **Publish to npm** run, then verify `npm view @trackdraw/viewer@<version> version dist.integrity` and install that exact version in a clean consumer. A published GitHub Release does not by itself prove npm publication succeeded.
+The workflow uses Node.js 24, npm 11, `id-token: write`, and the GitHub Environment `release`. The npm trusted publisher must match:
 
-`RENDERER_VERSION` reads `package.json`, so the shipped code reports the actual release version. For an unreleased `0.0.0` checkout it falls back to the development renderer's supported baseline (`0.1.0`). Keep `CURRENT_REQUIRED_VIEWER.minRendererVersion` at the oldest renderer that actually supports that snapshot contract; do not automatically raise the compatibility floor for every release. The release tag must be at least that floor.
+| Field                | Value             |
+| -------------------- | ----------------- |
+| Organization or user | `dutchdronesquad` |
+| Repository           | `track-viewer`    |
+| Workflow filename    | `publish.yml`     |
+| Environment          | `release`         |
 
-If a run fails before publishing, fix setup and rerun the failed job where appropriate. If the package version already exists, inspect the registry before retrying: npm versions cannot be overwritten. Code changes require a new version and release, not moving an existing published tag. Prerelease channels are deliberately not part of this initial workflow.
+Keep the matching [GitHub environment](https://github.com/dutchdronesquad/track-viewer/settings/environments) and allow direct publishing in the npm publisher configuration. Any environment protection rules apply before publication. If authentication fails, check these values and the workflow log against [npm's trusted publishing documentation](https://docs.npmjs.com/trusted-publishers/).
 
-## Complete the consumer migration
+The npm scope is `@trackdraw`; the GitHub organization is `dutchdronesquad`. Credentials belong in account settings, never in this repository or a chat.
 
-Only after the registry version exists, open the TrackDraw adoption PR: replace its pinned Git dependency with `@trackdraw/viewer@^<version>`, regenerate its lockfile, update the PVA's interim-distribution notes and run its required checks. Confirm a clean registry install before closing #876. DDS event embedding remains #861; host adapters remain separate work.
+## Release drafts and labels
+
+[Release Drafter](../.github/workflows/release-drafter.yml) updates the draft after pushes to `main` and supports manual runs. It inherits the [organization's GitHub defaults](https://github.com/dutchdronesquad/.github#readme). Apply appropriate PR labels, particularly `breaking-change` for incompatible public API changes. Review generated notes and the suggested version before publishing.
+
+[Sync labels](../.github/workflows/sync-labels.yml) synchronizes the shared labels weekly and can be run manually. It preserves additional repository labels.
+
+## Renderer compatibility and retries
+
+`RENDERER_VERSION` reads the package version, so the published 1.0.0 package reports `1.0.0`. Unreleased `0.0.0` checkouts use the development baseline `0.1.0`. This is separate from the snapshot schema and design version. Keep `CURRENT_REQUIRED_VIEWER.minRendererVersion` at the oldest renderer that supports the snapshot contract; do not raise it simply because the npm package reaches 1.0.0. Compatibility also checks required capabilities.
+
+If a run fails before publishing, fix the setup and rerun where appropriate. If the package version already exists, inspect the registry before retrying: published npm versions cannot be overwritten. Code changes require a new version and release, not moving an existing published tag.

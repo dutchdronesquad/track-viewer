@@ -1,8 +1,59 @@
 # Integration guide
 
+## Mount API
+
+Import `createTrackDrawViewer` from `@trackdraw/viewer` or `@trackdraw/viewer/mount`. Give it an empty, host-owned `HTMLElement` with an explicit width and height, plus `TrackDrawViewerOptions`. Keep the returned handle for updates and cleanup:
+
+- `update(options)` replaces the options; pass the complete set, including `design` and any callbacks or asset resolver you want to retain.
+- `destroy()` unmounts the viewer. Call it before removing or reusing the container. If you created archive asset URLs, dispose of those after destroying the viewer.
+
+The renderer is browser-only. In React or another component framework, mount it after the container exists and destroy it during cleanup. Keep updates on the existing handle rather than mounting another viewer in the same container. There is no public React component or `@trackdraw/viewer/react` entry point.
+
+| Option                | Purpose                                                                                          |
+| --------------------- | ------------------------------------------------------------------------------------------------ |
+| `design`              | Required portable `ViewerDesign`; use a validated snapshot's `design`.                           |
+| `initialView`         | Initial `"2d"` or `"3d"` mode; defaults to `"2d"`.                                               |
+| `view`                | Controlled `"2d"` or `"3d"` mode, overriding the internal selection.                             |
+| `showViewControls`    | Show the built-in mode buttons; defaults to `true`.                                              |
+| `onViewChange`        | Receives mode requests from the built-in buttons. A controlled host must update `view` itself.   |
+| `onViewStateChange`   | Reports effective `{ view, available3D }`, including fallback to 2D.                             |
+| `theme`               | `"light"` or `"dark"`; defaults to `"light"`.                                                    |
+| `unitSystem`          | Choose `"metric"` or `"imperial"`.                                                               |
+| `labels`              | Override the `grid`, `viewerPanZoom`, and `fitToWindow` labels; `grid` is a formatting function. |
+| `showObstacleNumbers` | Configure obstacle numbering.                                                                    |
+| `assetsBaseUrl`       | Override the catalog asset base URL for local or custom hosting.                                 |
+| `assetResolver`       | Resolve individual asset paths; takes precedence over `assetsBaseUrl`.                           |
+
+For a host-owned toolbar, set `showViewControls: false`, call `update({ ...options, view: nextView })` on selection, and use `onViewStateChange` to reflect the effective mode and hide or disable 3D when unavailable.
+
 ## Portable track contract
 
 `ViewerDesignSnapshot.design` is accepted directly as the `design` option of `createTrackDrawViewer`. It contains `version: 2`, `title`, `field`, `shapes`, and `updatedAt`; editor storage, inventory, ownership, and account data are not required. Validate untrusted JSON with `validateViewerDesignSnapshot` before rendering. Validation requires each shape kind's geometry, strips unknown fields, limits counts/dimensions and rejects duplicate IDs. `isViewerCompatible` checks the renderer floor and required capabilities separately.
+
+For snapshot JSON received from a file or API, validate before mounting:
+
+```ts
+import { validateViewerDesignSnapshot } from "@trackdraw/viewer/snapshot/schema";
+import {
+  isViewerCompatible,
+  RENDERER_VERSION,
+  RENDERER_CAPABILITIES,
+} from "@trackdraw/viewer/snapshot/version";
+
+// candidate is parsed JSON from your application's input.
+const snapshot = validateViewerDesignSnapshot(candidate);
+if (
+  !isViewerCompatible(snapshot.requiredViewer, {
+    rendererVersion: RENDERER_VERSION,
+    capabilities: new Set(RENDERER_CAPABILITIES),
+  })
+) {
+  throw new Error("This track requires a newer viewer.");
+}
+// Pass snapshot.design to createTrackDrawViewer.
+```
+
+Catch validation and compatibility errors in the host and show an appropriate message before replacing an existing preview. The mount API does not perform these snapshot checks for you.
 
 TrackDraw's REST API retains its existing snake_case response. Pass its `response.data` through `viewerSnapshotFromApi` (also exported at `./snapshot/api`) to obtain the same camelCase snapshot as a local export; private project provenance is stripped. Do not pass raw API shapes directly to the renderer.
 
