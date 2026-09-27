@@ -37,6 +37,4 @@ jobs:
       - name: Install and build
         run: npm ci
       - name: Publish
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: npm publish --ignore-scripts --provenance
