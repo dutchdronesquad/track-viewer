@@ -1,27 +1,18 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["github>dutchdronesquad/.github:renovate-base"],
-  "vulnerabilityAlerts": {
-    "enabled": true
-  },
-  "osvVulnerabilityAlerts": true,
+  "extends": ["github>dutchdronesquad/.github:renovate-node"],
   "packageRules": [
     {
       "groupName": "Radix UI",
       "groupSlug": "radix-ui",
-      "matchPackageNames": ["@radix-ui/{/,}**"]
+      "matchPackageNames": ["@radix-ui/{/,}**"],
+      "matchUpdateTypes": ["major"]
     },
     {
       "groupName": "Vitest",
       "groupSlug": "vitest",
-      "matchPackageNames": ["vitest", "@vitest/{/,}**"]
-    },
-    {
-      "groupName": "npm dependencies",
-      "groupSlug": "npm-dependencies",
-      "matchManagers": ["npm"],
-      "matchUpdateTypes": ["minor", "patch"],
-      "automerge": true
+      "matchPackageNames": ["vitest", "@vitest/{/,}**"],
+      "matchUpdateTypes": ["major"]
     }
   ]
 }
