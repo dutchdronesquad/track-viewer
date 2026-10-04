@@ -1,6 +1,6 @@
 export type AssetResolver = (path: string) => string;
 
-export const OBSTACLE_ASSETS_URL = "https://obstacles.trackdraw.app";
+export const OBSTACLE_ASSETS_URL = "https://assets.trackdraw.app";
 
 /** Resolve legacy catalog identifiers to hosted textures; explicit bases keep local/offline hosting. */
 export function createAssetResolver(baseUrl?: string): AssetResolver {
