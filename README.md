@@ -77,7 +77,7 @@ A `.tdviewer.zip` archive carries `snapshot.json` and the catalog textures used 
 
 Install the viewer JavaScript and CSS locally for offline use; archives contain data and images, not executable code. User-uploaded imagery and maps are outside the current archive format.
 
-Online catalog textures load from `https://obstacles.trackdraw.app` by default. Set `assetsBaseUrl` or `assetResolver` to use your own local assets; `assetResolver` takes precedence. Third-party catalog textures are not bundled in the npm package. The TrackDraw watermark is embedded and requires no network request.
+Online catalog textures load from `https://assets.trackdraw.app` by default. Set `assetsBaseUrl` or `assetResolver` to use your own local assets; `assetResolver` takes precedence. Third-party catalog textures are not bundled in the npm package. The TrackDraw watermark is embedded and requires no network request.
 
 ## Browser support
 
