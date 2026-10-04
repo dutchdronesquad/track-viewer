@@ -1,5 +1,18 @@
 # TrackDraw Viewer
 
+<!-- PROJECT SHIELDS -->
+
+[![npm version][npm-shield]][npm-url]
+[![npm downloads][downloads-shield]][npm-url]
+[![Types][types-shield]][npm-url]
+[![License][license-shield]](LICENSE)
+![Project Stage][project-stage-shield]
+![Project Maintenance][maintenance-shield]
+
+[![Linting][linting-shield]][linting-url]
+[![Tests][tests-shield]][tests-url]
+[![Publish to npm][publish-shield]][publish-url]
+
 Embed interactive 2D and 3D FPV race tracks in your website or application. **@trackdraw/viewer** renders portable [TrackDraw](https://trackdraw.app) track designs in a read-only viewer, with a plain JavaScript API and support for offline track archives.
 
 - **2D and 3D views** with per-instance themes, measurement units, labels, and obstacle numbering.
@@ -94,3 +107,19 @@ Report bugs or request features in [GitHub Issues](https://github.com/dutchdrone
 ## License
 
 [Apache-2.0](LICENSE). See [NOTICE.md](NOTICE.md) for attribution and third-party asset information.
+
+<!-- LINKS -->
+
+[downloads-shield]: https://img.shields.io/npm/dm/@trackdraw/viewer.svg
+[license-shield]: https://img.shields.io/github/license/dutchdronesquad/track-viewer.svg
+[linting-shield]: https://github.com/dutchdronesquad/track-viewer/actions/workflows/linting.yml/badge.svg
+[linting-url]: https://github.com/dutchdronesquad/track-viewer/actions/workflows/linting.yml
+[maintenance-shield]: https://img.shields.io/maintenance/yes/2026.svg
+[npm-shield]: https://img.shields.io/npm/v/@trackdraw/viewer.svg
+[npm-url]: https://www.npmjs.com/package/@trackdraw/viewer
+[project-stage-shield]: https://img.shields.io/badge/project%20stage-stable-green.svg
+[publish-shield]: https://github.com/dutchdronesquad/track-viewer/actions/workflows/publish.yml/badge.svg
+[publish-url]: https://github.com/dutchdronesquad/track-viewer/actions/workflows/publish.yml
+[tests-shield]: https://github.com/dutchdronesquad/track-viewer/actions/workflows/tests.yaml/badge.svg
+[tests-url]: https://github.com/dutchdronesquad/track-viewer/actions/workflows/tests.yaml
+[types-shield]: https://img.shields.io/npm/types/@trackdraw/viewer.svg
