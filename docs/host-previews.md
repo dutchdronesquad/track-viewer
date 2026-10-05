@@ -5,11 +5,15 @@ Hosts can frame a compact preview without simulated mouse gestures:
 ```ts
 createTrackDrawViewer(container, {
   design,
-  initialView: '3d',
+  initialView: "3d",
   showViewControls: false,
   camera3D: { position: [5, 3, 12], target: [5, 1, 2.5], minDistance: 4 },
-  gateBackColors: { 'view-0': '#112233', 'view-1': '#112233', 'view-2': '#112233' },
-  assetResolver: path => panels[path],
+  gateBackColors: {
+    "view-0": "#112233",
+    "view-1": "#112233",
+    "view-2": "#112233",
+  },
+  assetResolver: (path) => panels[path],
 });
 ```
 
