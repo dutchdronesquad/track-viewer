@@ -31,8 +31,7 @@ jobs:
       - name: Install npm with trusted publishing support
         run: npm install --global npm@11
       - name: Set release version
-        run: |
-          node scripts/set-release-version.mjs "$GITHUB_REF_NAME"
+        run: node scripts/set-release-version.mjs "$GITHUB_REF_NAME"
       - name: Install and build
         run: npm ci
       - name: Publish schema first
