@@ -116,7 +116,7 @@ test("packed package installs and typechecks in a host without React", () => {
       import { validateViewerDesignSnapshot } from "@trackdraw/viewer/snapshot/schema";
       import { readViewerArchive } from "@trackdraw/viewer/snapshot/archive";
       declare const design: ViewerDesign;
-      const options: TrackDrawViewerOptions = { design, theme: "dark" };
+      const options: TrackDrawViewerOptions = { design, theme: "dark", camera3D: { position: [1, 2, 3], target: [0, 1, 0] }, gateBackColors: { gate: "#112233" } };
       const viewer = createTrackDrawViewer(document.createElement("div"), options);
       const mountOptions: Parameters<typeof mount>[1] = options;
       viewer.update(mountOptions);
