@@ -1,101 +1,38 @@
 {
-  "name": "@trackdraw/viewer",
+  "name": "track-viewer-workspace",
   "version": "0.0.0",
-  "description": "Framework-neutral 2D/3D track viewer for TrackDraw track snapshots.",
+  "private": true,
   "license": "Apache-2.0",
   "type": "module",
-  "sideEffects": [
-    "**/*.css"
+  "workspaces": [
+    "packages/schema",
+    "packages/viewer"
   ],
-  "files": [
-    "dist",
-    "LICENSE",
-    "NOTICE.md",
-    "README.md"
-  ],
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
-    },
-    "./mount": {
-      "types": "./dist/mount.d.ts",
-      "import": "./dist/mount.js"
-    },
-    "./snapshot/types": {
-      "types": "./dist/snapshot/types.d.ts",
-      "import": "./dist/snapshot/types.js"
-    },
-    "./snapshot/version": {
-      "types": "./dist/snapshot/version.d.ts",
-      "import": "./dist/snapshot/version.js"
-    },
-    "./snapshot/schema": {
-      "types": "./dist/snapshot/schema.d.ts",
-      "import": "./dist/snapshot/schema.js"
-    },
-    "./assets/manifest": {
-      "types": "./dist/assets/manifest.d.ts",
-      "import": "./dist/assets/manifest.js"
-    },
-    "./assets/texture-paths": {
-      "types": "./dist/assets/texture-paths.d.ts",
-      "import": "./dist/assets/texture-paths.js"
-    },
-    "./assets/asset-url": {
-      "types": "./dist/assets/asset-url.d.ts",
-      "import": "./dist/assets/asset-url.js"
-    },
-    "./static/trackdraw-viewer.css": {
-      "types": "./dist/static/trackdraw-viewer.css.d.ts",
-      "default": "./dist/static/trackdraw-viewer.css"
-    },
-    "./snapshot/api": {
-      "types": "./dist/snapshot/api.d.ts",
-      "import": "./dist/snapshot/api.js"
-    },
-    "./snapshot/identity": {
-      "types": "./dist/snapshot/identity.d.ts",
-      "import": "./dist/snapshot/identity.js"
-    },
-    "./snapshot/archive": {
-      "types": "./dist/snapshot/archive.d.ts",
-      "import": "./dist/snapshot/archive.js"
-    }
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/dutchdronesquad/track-viewer.git"
-  },
-  "homepage": "https://github.com/dutchdronesquad/track-viewer",
-  "bugs": "https://github.com/dutchdronesquad/track-viewer/issues",
   "scripts": {
     "prepare": "npm run build",
-    "build": "node scripts/clean-dist.mjs && tsup && tsc -p tsconfig.build.json && node scripts/build-css.mjs",
-    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "build": "npm run build --workspace @trackdraw/schema && npm run build --workspace @trackdraw/viewer",
+    "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p packages/schema/tsconfig.json && tsc --noEmit -p packages/viewer/tsconfig.json",
     "lint": "oxlint .",
     "lint:fix": "oxlint --fix .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:package": "node --test tests/package/*.test.mjs"
-  },
-  "dependencies": {
-    "@noble/hashes": "^2.4.0",
-    "fflate": "^0.8.3",
-    "zod": "^4.0.0"
+    "test:package": "node --test tests/package/*.test.mjs",
+    "assets:catalog-manifest": "node scripts/generate-catalog-textures.mjs"
   },
   "devDependencies": {
     "@radix-ui/react-tooltip": "^1.2.8",
     "@react-three/drei": "^10.7.7",
     "@react-three/fiber": "^9.5.0",
     "@tailwindcss/cli": "^4",
+    "@types/node": "^26.6.1",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@types/three": "^0.185.0",
     "clsx": "^2.1.1",
     "es-module-lexer": "^2.3.2",
+    "esbuild": "^0.27.7",
     "happy-dom": "^20.8.9",
     "konva": "^10.0.2",
     "lucide-react": "^1.21.0",
@@ -115,9 +52,5 @@
     "tw-animate-css": "^1.4.0",
     "typescript": "^7.0.0",
     "vitest": "^4.1.4"
-  },
-  "publishConfig": {
-    "access": "public",
-    "registry": "https://registry.npmjs.org"
   }
 }

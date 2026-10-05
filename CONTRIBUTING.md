@@ -12,21 +12,22 @@ npm run build
 npm run test:package
 ```
 
-`npm ci` also builds the package through the `prepare` script. After making changes, run the checks above before opening a pull request. Package checks inspect emitted chunks and install a packed tarball in a temporary consumer without React; they prefer the npm cache and fetch missing dependencies from the registry.
+`npm ci` also builds both packages, schema before viewer through the `prepare` script. After making changes, run the checks above before opening a pull request. Package checks inspect emitted chunks and install a packed tarball in a temporary consumer without React; they prefer the npm cache and fetch missing dependencies from the registry.
 
 ## Build outputs
 
-- `dist/` contains the self-contained ESM mount API and lightweight snapshot/asset entry points. TypeScript declarations are emitted under `dist/`.
-- `dist/static/trackdraw-viewer.global.js` bundles the viewer and its JavaScript dependencies for plain HTML hosts.
-- `dist/static/trackdraw-viewer.css` contains scoped styles for both ESM and static consumers.
+- `packages/schema/dist/` contains renderer-independent contract and asset entry points.
+- `packages/viewer/dist/` contains the self-contained ESM mount API and lightweight snapshot/asset entry points. TypeScript declarations are emitted under `dist/`.
+- `packages/viewer/dist/static/trackdraw-viewer.global.js` bundles the viewer and its JavaScript dependencies for plain HTML hosts.
+- `packages/viewer/dist/static/trackdraw-viewer.css` contains scoped styles for both ESM and static consumers.
 
-Renderer libraries, including React and React DOM, are build-time dependencies bundled into the ESM and static outputs. The published package has no peer dependencies. Keep the public mount types free of React imports.
+Renderer libraries, including React and React DOM, are build-time dependencies bundled into the ESM and static outputs. The viewer depends on schema; neither published package has peer dependencies. Keep the public mount types free of React imports.
 
-Declarations are emitted with `tsc -p tsconfig.build.json`, separately from tsup. See `tsup.config.ts` for the build configuration. Serve the repository with a local HTTP server after building to try [the static archive example](examples/static.html).
+Declarations are emitted with `tsc -p tsconfig.build.json`, separately from tsup. See each package's `tsup.config.ts` for the build configuration. Serve the repository with a local HTTP server after building to try [the static archive example](examples/static.html).
 
 ## Rendering sources
 
-**Vendored, not shared, source.** Files under `src/lib/` and `src/components/` originated as copies of pure/leaf logic from the trackdraw app (`src/lib/track/*`, `src/components/canvas/*`, `src/hooks/*`) — not re-exports or a shared module. They will not automatically pick up future changes to trackdraw's originals; keep them in sync manually if the app's copy changes in a way that matters for rendering fidelity. A few app-only exports were intentionally dropped during vendoring (e.g. `design.ts`'s serialize/normalize/create functions, which pulled in map-reference and inventory-planning code this read-only viewer never needs) — see the file-level comments on the trimmed copies.
+**Vendored, not shared, source.** Files under `packages/viewer/src/lib/` and `packages/viewer/src/components/` originated as copies of pure/leaf logic from the trackdraw app (`src/lib/track/*`, `src/components/canvas/*`, `src/hooks/*`) — not re-exports or a shared module. They will not automatically pick up future changes to trackdraw's originals; keep them in sync manually if the app's copy changes in a way that matters for rendering fidelity. A few app-only exports were intentionally dropped during vendoring (e.g. `design.ts`'s serialize/normalize/create functions, which pulled in map-reference and inventory-planning code this read-only viewer never needs) — see the file-level comments on the trimmed copies.
 
 ## Dependency updates
 
@@ -46,5 +47,9 @@ This package started life inside the trackdraw monorepo at `packages/viewer/` an
 
 - Phase 1 ([trackdraw#859](https://github.com/dutchdronesquad/trackdraw/issues/859)) proved extraction, finalized the display-metadata allowlist (`src/snapshot/`), and fixed the eager whole-catalog texture preload.
 - Phase 2 ([trackdraw#860](https://github.com/dutchdronesquad/trackdraw/issues/860)) added `package.json`, the ESM + static builds, the asset manifest (`src/assets/manifest.ts`), schema-validated snapshots (`src/snapshot/schema.ts`), and the shared snapshot builder's first real callers in the app.
-- [trackdraw#870](https://github.com/dutchdronesquad/trackdraw/issues/870) vendored the package's remaining app-internal dependencies (2D/3D catalog rendering, geometry, and shape utilities) into `src/lib/` and `src/components/`, so `src/**` had zero remaining imports into the app.
+- [trackdraw#870](https://github.com/dutchdronesquad/trackdraw/issues/870) vendored the package's remaining app-internal dependencies (2D/3D catalog rendering, geometry, and shape utilities) into `packages/viewer/src/lib/` and `packages/viewer/src/components/`, so `src/**` had zero remaining imports into the app.
 - [trackdraw#871](https://github.com/dutchdronesquad/trackdraw/issues/871) split this directory out into its own repository (`dutchdronesquad/track-viewer`), preserving its git history, with its own CI and a single root `LICENSE` instead of per-file headers.
+
+## Shared contract ownership
+
+See [Shared schema migration](docs/schema-migration.md) for ownership, compatibility and consumer release order. Schema must not import viewer/catalog geometry or rendering libraries. Run `npm run assets:catalog-manifest` when catalog texture references change; package tests inspect every emitted schema import and install schema alone without renderer dependencies or DOM initialization. Keep root and package manifests at `0.0.0` in Git.

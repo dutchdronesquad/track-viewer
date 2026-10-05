@@ -66,14 +66,18 @@ Online texture URLs are stable and may receive compatible artwork updates indepe
 A `.tdviewer.zip` contains `snapshot.json` and exactly the texture files listed in its manifest, under `assets/...`. It contains no executable code. The viewer's static script/CSS must be installed separately on the host. MultiGP images are included only for the track that uses them, not redistributed inside this npm package.
 
 ```ts
-import { createTrackDrawViewer } from "@trackdraw/viewer";
+import {
+  createTrackDrawViewer,
+  assertViewerSnapshotSupported,
+} from "@trackdraw/viewer";
 import {
   readViewerArchive,
   createViewerArchiveAssets,
-} from "@trackdraw/viewer/snapshot/archive";
+} from "@trackdraw/schema/snapshot/archive";
 import "@trackdraw/viewer/static/trackdraw-viewer.css";
 
 const archive = readViewerArchive(new Uint8Array(await file.arrayBuffer()));
+assertViewerSnapshotSupported(archive.snapshot);
 const assets = createViewerArchiveAssets(archive);
 const viewer = createTrackDrawViewer(container, {
   design: archive.snapshot.design,
@@ -89,7 +93,7 @@ The static global exposes the same archive reader/object-URL helper alongside `c
 
 `createViewerArchiveWithCurrentAssets(snapshot, readAsset)` captures the current approved texture bytes and updates the archive manifest and snapshot ID. Use it when exporting from the live asset host; old archives remain readable and retain their own byte-integrity checks.
 
-`createViewerArchive(snapshot, readAsset)` lets browser exports and backend API adapters build the same archive. It never fetches implicitly: the caller supplies approved local bytes or an approved fetcher. It verifies catalog manifest completeness, renderer compatibility, stable snapshot identity, sizes and SHA-256 hashes before returning bytes. Import rejects missing, extra, duplicate and unsafe paths, unsupported tracks, corrupt assets, and oversized archives (4 MB snapshot, 8 MB per asset, 64 MB archive/expanded total). Hashes check integrity, not authorship. V1 supports the installed catalog assets only; user-uploaded imagery/maps are outside this contract.
+`createViewerArchive(snapshot, readAsset)` lets browser exports and backend API adapters build the same archive. It never fetches implicitly: the caller supplies approved local bytes or an approved fetcher. It verifies catalog manifest completeness, stable snapshot identity, sizes and SHA-256 hashes before returning bytes. Import rejects missing, extra, duplicate and unsafe paths, corrupt assets, and oversized archives (4 MB snapshot, 8 MB per asset, 64 MB archive/expanded total). Hashes check integrity, not authorship. V1 supports the installed catalog assets only; user-uploaded imagery/maps are outside this contract.
 
 ## Runtime and lifecycle
 
@@ -98,3 +102,7 @@ Provide an explicitly sized container, e.g. `height: 420px; width: 100%`. Each v
 2D-only instances do not mount a WebGL renderer or load 3D textures. Once visited, a hidden 3D scene pauses its frame loop while retaining its camera. 3D requires WebGL2; unavailable or failed initialization/context loss leaves the existing 2D view usable. `destroy()` unmounts the React root and releases instance resources. The watermark is embedded and requires no CDN CORS configuration; externally hosted catalog textures still require the asset host to permit CORS.
 
 Use a modern browser with ES modules, ResizeObserver, and CSS nesting support; WebGL2 is optional. The static artifact bundles React and all JavaScript dependencies. The ESM mount API also bundles React internally and requires no React installation in the host. ESM consumers need a bundler that resolves the package chunks. Serve the static JavaScript and CSS locally for cold offline use.
+
+## Shared data package
+
+Import new snapshot/asset helpers and types from `@trackdraw/schema`, including `viewerSnapshotFromApi`. Validate renderer compatibility with `assertViewerSnapshotSupported(snapshot)` from the viewer before mounting. Existing viewer data subpaths remain available through 1.x with the legacy archive support checks. See [Shared schema migration](schema-migration.md) for the producer adapter boundary and release order.

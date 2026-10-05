@@ -1,8 +1,8 @@
-import { getViewerSnapshotId } from "../../src/snapshot/identity";
+import { getViewerSnapshotId } from "../../packages/schema/src/snapshot/identity";
 import {
   VIEWER_SNAPSHOT_SCHEMA,
   type ViewerDesignSnapshot,
-} from "../../src/snapshot/types";
+} from "../../packages/schema/src/snapshot/types";
 
 export function snapshotFixture(): ViewerDesignSnapshot {
   const snapshot: ViewerDesignSnapshot = {

@@ -1,17 +1,17 @@
 // @vitest-environment happy-dom
 import { act } from "react";
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
-import { createTrackDrawViewer } from "../../src/mount";
+import { createTrackDrawViewer } from "../../packages/viewer/src/mount";
 import { snapshotFixture } from "../helpers/snapshot";
 
 const state = vi.hoisted(() => ({ fail: false }));
-vi.mock("../../src/capabilities/useWebglSupport", () => ({
+vi.mock("../../packages/viewer/src/capabilities/useWebglSupport", () => ({
   useWebglSupport: (forced: boolean) => (forced ? "unsupported" : "supported"),
 }));
-vi.mock("../../src/viewer-2d/TrackViewer2D", () => ({
+vi.mock("../../packages/viewer/src/viewer-2d/TrackViewer2D", () => ({
   default: () => <div data-view="2d" />,
 }));
-vi.mock("../../src/viewer-3d/TrackViewer3D", () => ({
+vi.mock("../../packages/viewer/src/viewer-3d/TrackViewer3D", () => ({
   default: ({ active }: { active: boolean }) => {
     if (state.fail) throw new Error("WebGL initialization failed");
     return <div data-view="3d" data-active={String(active)} />;

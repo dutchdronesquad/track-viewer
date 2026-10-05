@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   createAssetResolver,
   IDENTITY_ASSET_RESOLVER,
-} from "@trackdraw/viewer/assets/asset-url";
+} from "@trackdraw/schema/assets/asset-url";
 
 describe("createAssetResolver", () => {
   it("returns the path unchanged with an empty base", () => {

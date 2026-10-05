@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { getTrackElementCatalogEntry } from "../../src/lib/track/elements/catalog";
-import { withGateBackColor } from "../../src/viewer-3d/items/gate-back-color";
+import { getTrackElementCatalogEntry } from "../../packages/viewer/src/lib/track/elements/catalog";
+import { withGateBackColor } from "../../packages/viewer/src/viewer-3d/items/gate-back-color";
 
 describe("host gate back colour", () => {
   it("colours all unprinted panels while preserving front artwork and the catalog", () => {

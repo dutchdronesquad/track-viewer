@@ -11,16 +11,24 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
+import { runInNewContext } from "node:vm";
 import { init, parse } from "es-module-lexer";
 
 await init;
 
 const root = fileURLToPath(new URL("../..", import.meta.url));
-const pkg = JSON.parse(readFileSync(path.join(root, "package.json"), "utf8"));
+const viewerRoot = path.join(root, "packages/viewer");
+const schemaRoot = path.join(root, "packages/schema");
+const pkg = JSON.parse(
+  readFileSync(path.join(viewerRoot, "package.json"), "utf8")
+);
+const schemaPkg = JSON.parse(
+  readFileSync(path.join(schemaRoot, "package.json"), "utf8")
+);
 
 // Follow static and lazy imports: checking only entry files would miss a
 // renderer dependency or a second React copy hidden in a shared chunk.
-function graph(entry) {
+function graph(entry, packageRoot = viewerRoot) {
   const visited = new Set();
   const external = new Set();
   const sources = new Set();
@@ -35,10 +43,19 @@ function graph(entry) {
       assert.ok(specifier.n, `Nonliteral import in ${file}`);
       const name = specifier.n;
       if (name.startsWith(".")) visit(path.resolve(path.dirname(file), name));
-      else external.add(name);
+      else if (
+        name === "@trackdraw/schema" ||
+        name.startsWith("@trackdraw/schema/")
+      ) {
+        const subpath =
+          name === "@trackdraw/schema"
+            ? "."
+            : `.${name.slice("@trackdraw/schema".length)}`;
+        visit(path.join(schemaRoot, schemaPkg.exports[subpath].import));
+      } else external.add(name);
     }
   }
-  visit(path.resolve(root, entry));
+  visit(path.resolve(packageRoot, entry));
   return { external, sources };
 }
 const isReactSource = (source) =>
@@ -47,7 +64,13 @@ const isReactSource = (source) =>
 test("standalone entries bundle their runtime, including lazy 3D imports", () => {
   for (const entry of [".", "./mount"]) {
     const result = graph(pkg.exports[entry].import);
-    assert.deepEqual([...result.external], []);
+    assert.ok(
+      [...result.external].every((name) =>
+        Object.keys(schemaPkg.dependencies).some(
+          (dep) => name === dep || name.startsWith(`${dep}/`)
+        )
+      )
+    );
     assert.ok([...result.sources].some(isReactSource));
   }
 });
@@ -56,7 +79,13 @@ test("snapshot and asset subpaths do not pull in the renderer", () => {
   for (const [name, entry] of Object.entries(pkg.exports)) {
     if (!/^\.\/(snapshot|assets)\//.test(name)) continue;
     const result = graph(entry.import);
-    assert.deepEqual([...result.external], []);
+    assert.ok(
+      [...result.external].every((name) =>
+        Object.keys(schemaPkg.dependencies).some(
+          (dep) => name === dep || name.startsWith(`${dep}/`)
+        )
+      )
+    );
     assert.ok(
       ![...result.sources].some((source) =>
         /node_modules\/(react|react-dom|three|konva)\//.test(source)
@@ -69,14 +98,21 @@ test("packed package installs and typechecks in a host without React", () => {
   assert.equal(pkg.peerDependencies, undefined);
   assert.equal(pkg.peerDependenciesMeta, undefined);
   assert.equal(pkg.exports["./react"], undefined);
-  assert.equal(existsSync(path.join(root, "dist/react")), false);
+  assert.equal(existsSync(path.join(viewerRoot, "dist/react")), false);
   const dir = mkdtempSync(path.join(tmpdir(), "track-viewer-consumer-"));
   try {
     const packed = JSON.parse(
       execFileSync(
         "npm",
         ["pack", "--ignore-scripts", "--json", "--pack-destination", dir],
-        { cwd: root, encoding: "utf8" }
+        { cwd: viewerRoot, encoding: "utf8" }
+      )
+    );
+    const packedSchema = JSON.parse(
+      execFileSync(
+        "npm",
+        ["pack", "--ignore-scripts", "--json", "--pack-destination", dir],
+        { cwd: schemaRoot, encoding: "utf8" }
       )
     );
     writeFileSync(
@@ -88,6 +124,7 @@ test("packed package installs and typechecks in a host without React", () => {
       [
         "install",
         path.join(dir, packed[0].filename),
+        path.join(dir, packedSchema[0].filename),
         "--ignore-scripts",
         "--prefer-offline",
         "--no-audit",
@@ -155,4 +192,148 @@ test("packed package installs and typechecks in a host without React", () => {
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }
+});
+
+const forbidden =
+  /(?:react|react-dom|three|konva|\.css(?:$|[?"'])|viewer\/src\/(?:lib|components|viewer-))/;
+
+test("every emitted schema entry stays independent of rendering and DOM initialization", () => {
+  assert.equal(schemaPkg.dependencies["@trackdraw/viewer"], undefined);
+  assert.equal(schemaPkg.peerDependencies, undefined);
+  for (const entry of Object.values(schemaPkg.exports)) {
+    const result = graph(entry.import, schemaRoot);
+    assert.ok(
+      ![...result.sources, ...result.external].some((source) =>
+        forbidden.test(source)
+      )
+    );
+    assert.ok(
+      [...result.external].every((name) =>
+        Object.keys(schemaPkg.dependencies).some(
+          (dep) => name === dep || name.startsWith(`${dep}/`)
+        )
+      )
+    );
+  }
+});
+
+test("schema alone installs, imports all entries and typechecks without renderer dependencies", () => {
+  const dir = mkdtempSync(path.join(tmpdir(), "track-schema-consumer-"));
+  try {
+    const packed = JSON.parse(
+      execFileSync(
+        "npm",
+        ["pack", "--ignore-scripts", "--json", "--pack-destination", dir],
+        { cwd: schemaRoot, encoding: "utf8" }
+      )
+    );
+    writeFileSync(
+      path.join(dir, "package.json"),
+      JSON.stringify({ private: true, type: "module" })
+    );
+    execFileSync(
+      "npm",
+      [
+        "install",
+        path.join(dir, packed[0].filename),
+        "--ignore-scripts",
+        "--prefer-offline",
+        "--no-audit",
+        "--no-fund",
+      ],
+      { cwd: dir, stdio: "pipe" }
+    );
+    for (const dependency of [
+      "@trackdraw/viewer",
+      "react",
+      "react-dom",
+      "@types/react",
+      "three",
+      "konva",
+    ])
+      assert.equal(
+        existsSync(path.join(dir, "node_modules", dependency)),
+        false
+      );
+    const fixture = readFileSync(
+      path.join(root, "tests/fixtures/viewer-1.0.1.json"),
+      "utf8"
+    );
+    writeFileSync(
+      path.join(dir, "consumer.ts"),
+      `
+      import { validateViewerDesignSnapshot, getViewerSnapshotId, getRequiredViewer, createViewerArchive, readViewerArchive, type ViewerDesignSnapshot } from "@trackdraw/schema";
+      const snapshot: ViewerDesignSnapshot = validateViewerDesignSnapshot(${fixture});
+      void getRequiredViewer(snapshot.design.shapes);
+      if (getViewerSnapshotId(snapshot) !== snapshot.snapshotId) throw new Error("Legacy identity changed");
+      const bytes = await createViewerArchive(snapshot, async () => new Uint8Array([1, 2, 3]));
+      if (readViewerArchive(bytes).snapshot.snapshotId !== snapshot.snapshotId) throw new Error("Roundtrip changed");
+    `
+    );
+    execFileSync(
+      path.join(root, "node_modules/.bin/tsc"),
+      [
+        "--strict",
+        "--module",
+        "nodenext",
+        "--moduleResolution",
+        "nodenext",
+        "--target",
+        "es2022",
+        "--lib",
+        "es2022,dom",
+        "consumer.ts",
+      ],
+      { cwd: dir, stdio: "pipe" }
+    );
+    execFileSync(process.execPath, ["consumer.js"], {
+      cwd: dir,
+      stdio: "pipe",
+    });
+    const imports = Object.keys(schemaPkg.exports)
+      .map(
+        (name) =>
+          `await import(${JSON.stringify(`@trackdraw/schema${name === "." ? "" : name.slice(1)}`)});`
+      )
+      .join("\n");
+    execFileSync(
+      process.execPath,
+      [
+        "--input-type=module",
+        "-e",
+        `if (typeof document !== 'undefined') throw Error('Unexpected DOM');\n${imports}`,
+      ],
+      { cwd: dir, stdio: "pipe" }
+    );
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test("the self-contained static viewer reads legacy offline assets", () => {
+  const source = readFileSync(
+    path.join(viewerRoot, "dist/static/trackdraw-viewer.global.js"),
+    "utf8"
+  );
+  const context = {
+    TextEncoder,
+    TextDecoder,
+    Uint8Array,
+    console,
+    setTimeout,
+    clearTimeout,
+    setInterval,
+    clearInterval,
+    queueMicrotask,
+  };
+  runInNewContext(source, context);
+  const bytes = new Uint8Array(
+    readFileSync(path.join(root, "tests/fixtures/viewer-1.0.1.tdviewer.zip"))
+  );
+  const archive = context.TrackDrawViewer.readViewerArchive(bytes);
+  const snapshot = JSON.parse(
+    readFileSync(path.join(root, "tests/fixtures/viewer-1.0.1.json"), "utf8")
+  );
+  assert.equal(archive.snapshot.snapshotId, snapshot.snapshotId);
+  assert.equal(archive.assets.size, 1);
 });

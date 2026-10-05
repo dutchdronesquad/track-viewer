@@ -4,7 +4,14 @@ import { defineConfig } from "vitest/config";
 export default defineConfig({
   resolve: {
     alias: {
-      "@trackdraw/viewer": path.resolve(import.meta.dirname, "src"),
+      "@trackdraw/schema": path.resolve(
+        import.meta.dirname,
+        "packages/schema/src"
+      ),
+      "@trackdraw/viewer": path.resolve(
+        import.meta.dirname,
+        "packages/viewer/src"
+      ),
     },
   },
   test: {
@@ -16,8 +23,8 @@ export default defineConfig({
     clearMocks: true,
     coverage: {
       provider: "v8",
-      include: ["src/**/*.{ts,tsx}"],
-      exclude: ["src/**/*.d.ts"],
+      include: ["packages/*/src/**/*.{ts,tsx}"],
+      exclude: ["packages/*/src/**/*.d.ts"],
       reporter: ["text", "html", "json-summary"],
       reportsDirectory: "./coverage",
     },

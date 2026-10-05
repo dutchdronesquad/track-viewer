@@ -1,7 +1,7 @@
 // @vitest-environment happy-dom
 import { expect, it, vi } from "vitest";
-import { getPolylineArrowMarkers } from "../../src/lib/track/geometry";
-import { createTextTexture } from "../../src/components/canvas/preview3d/items/texture-cache";
+import { getPolylineArrowMarkers } from "../../packages/viewer/src/lib/track/geometry";
+import { createTextTexture } from "../../packages/viewer/src/components/canvas/preview3d/items/texture-cache";
 
 it("bounds arrow generation for tiny positive spacing", () => {
   const markers = getPolylineArrowMarkers(
