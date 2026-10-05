@@ -13,10 +13,13 @@
     "isolatedModules": true,
     "jsx": "react-jsx",
     "paths": {
-      "@trackdraw/viewer": ["./src/index.ts"],
-      "@trackdraw/viewer/*": ["./src/*"]
-    }
+      "@trackdraw/viewer": ["./packages/viewer/src/index.ts"],
+      "@trackdraw/viewer/*": ["./packages/viewer/src/*"],
+      "@trackdraw/schema": ["./packages/schema/src/index.ts"],
+      "@trackdraw/schema/*": ["./packages/schema/src/*"]
+    },
+    "types": ["node", "react", "react-dom"]
   },
-  "include": ["src", "tests"],
+  "include": ["packages/*/src", "tests"],
   "exclude": ["node_modules", "dist"]
 }

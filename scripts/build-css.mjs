@@ -2,9 +2,8 @@ import { execFileSync } from "node:child_process";
 import path from "node:path";
 import { readFileSync, writeFileSync } from "node:fs";
 import postcss from "postcss";
-import { fileURLToPath } from "node:url";
 
-const ROOT = fileURLToPath(new URL("..", import.meta.url));
+const ROOT = process.cwd();
 
 const input = path.join(ROOT, "src/static-entry.css");
 const output = path.join(ROOT, "dist/static/trackdraw-viewer.css");

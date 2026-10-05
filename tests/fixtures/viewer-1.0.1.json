@@ -1,0 +1,54 @@
+{
+  "schema": "trackdraw.viewer-snapshot.v1",
+  "snapshotId": "sha256:e9827c9c0d7b5262f4a79a0fed0ce15ba09ddb250d7e5b4167b3a7d6ec25b007",
+  "requiredViewer": {
+    "schema": "trackdraw.viewer-snapshot.v1",
+    "minRendererVersion": "0.1.0",
+    "capabilities": ["catalog:multigp", "shape:barrier"]
+  },
+  "design": {
+    "version": 2,
+    "title": "Legacy textured track",
+    "field": {
+      "width": 60,
+      "height": 40,
+      "origin": "tl",
+      "gridStep": 1,
+      "ppm": 20
+    },
+    "shapes": [
+      {
+        "id": "hurdle",
+        "x": 10,
+        "y": 10,
+        "rotation": 0,
+        "meta": {
+          "catalog": {
+            "version": 1,
+            "elementId": "multigp-hurdle",
+            "assignedKind": "barrier",
+            "official": true,
+            "snapshot": {
+              "name": "Hurdle",
+              "organization": "MultiGP",
+              "dimensionsLabel": "5x10"
+            }
+          }
+        },
+        "kind": "barrier",
+        "variant": "hurdle",
+        "width": 3,
+        "height": 1
+      }
+    ],
+    "updatedAt": "2026-09-23T00:00:00.000Z"
+  },
+  "assets": [
+    {
+      "path": "/assets/models/textures/multigp-obstacles/5x10-hurdle-multigp.webp",
+      "contentType": "image/webp",
+      "sizeBytes": 3,
+      "sha256": "039058c6f2c0cb492c533b0a4d14ef77cc0f78abccced5287d84a1a2011cfb81"
+    }
+  ]
+}

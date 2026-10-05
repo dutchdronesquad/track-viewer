@@ -1,0 +1,82 @@
+{
+  "name": "@trackdraw/viewer",
+  "version": "0.0.0",
+  "description": "Framework-neutral 2D/3D track viewer for TrackDraw track snapshots.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "files": [
+    "dist",
+    "LICENSE",
+    "NOTICE.md",
+    "README.md"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./mount": {
+      "types": "./dist/mount.d.ts",
+      "import": "./dist/mount.js"
+    },
+    "./snapshot/types": {
+      "types": "./dist/snapshot/types.d.ts",
+      "import": "./dist/snapshot/types.js"
+    },
+    "./snapshot/version": {
+      "types": "./dist/snapshot/version.d.ts",
+      "import": "./dist/snapshot/version.js"
+    },
+    "./snapshot/schema": {
+      "types": "./dist/snapshot/schema.d.ts",
+      "import": "./dist/snapshot/schema.js"
+    },
+    "./assets/manifest": {
+      "types": "./dist/assets/manifest.d.ts",
+      "import": "./dist/assets/manifest.js"
+    },
+    "./assets/texture-paths": {
+      "types": "./dist/assets/texture-paths.d.ts",
+      "import": "./dist/assets/texture-paths.js"
+    },
+    "./assets/asset-url": {
+      "types": "./dist/assets/asset-url.d.ts",
+      "import": "./dist/assets/asset-url.js"
+    },
+    "./static/trackdraw-viewer.css": {
+      "types": "./dist/static/trackdraw-viewer.css.d.ts",
+      "default": "./dist/static/trackdraw-viewer.css"
+    },
+    "./snapshot/api": {
+      "types": "./dist/snapshot/api.d.ts",
+      "import": "./dist/snapshot/api.js"
+    },
+    "./snapshot/identity": {
+      "types": "./dist/snapshot/identity.d.ts",
+      "import": "./dist/snapshot/identity.js"
+    },
+    "./snapshot/archive": {
+      "types": "./dist/snapshot/archive.d.ts",
+      "import": "./dist/snapshot/archive.js"
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dutchdronesquad/track-viewer.git"
+  },
+  "homepage": "https://github.com/dutchdronesquad/track-viewer",
+  "bugs": "https://github.com/dutchdronesquad/track-viewer/issues",
+  "dependencies": {
+    "@trackdraw/schema": "0.0.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org"
+  },
+  "scripts": {
+    "build": "node ../../scripts/clean-dist.mjs && tsup && tsc -p tsconfig.build.json && node ../../scripts/build-css.mjs"
+  }
+}

@@ -3,7 +3,7 @@ import { act } from "react";
 import { createRoot } from "react-dom/client";
 import { Texture } from "three";
 import { expect, it, vi } from "vitest";
-import { usePreviewTextures } from "../../src/viewer-3d/items/use-preview-textures";
+import { usePreviewTextures } from "../../packages/viewer/src/viewer-3d/items/use-preview-textures";
 
 const loader = vi.hoisted(() => ({
   cache: new Map<string, unknown[]>(),

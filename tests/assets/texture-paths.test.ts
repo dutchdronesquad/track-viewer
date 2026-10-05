@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { getDesignTexturePaths } from "@trackdraw/viewer/assets/texture-paths";
+import { getDesignTexturePaths } from "@trackdraw/schema/assets/texture-paths";
 import {
   createCatalogShapeDraft,
   MULTIGP_HURDLE_ELEMENT_ID,

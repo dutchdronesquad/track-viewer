@@ -2,8 +2,8 @@ import { describe, expect, it, vi } from "vitest";
 import {
   getAssetManifestEntry,
   getDesignAssetManifest,
-} from "@trackdraw/viewer/assets/manifest";
-import * as texturePaths from "@trackdraw/viewer/assets/texture-paths";
+} from "@trackdraw/schema/assets/manifest";
+import * as texturePaths from "@trackdraw/schema/assets/texture-paths";
 import {
   createCatalogShapeDraft,
   MULTIGP_HURDLE_ELEMENT_ID,

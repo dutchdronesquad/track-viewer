@@ -1,0 +1,78 @@
+{
+  "name": "@trackdraw/schema",
+  "version": "0.0.0",
+  "description": "Portable TrackDraw snapshot contract, validation, identity, archives and asset helpers.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "sideEffects": false,
+  "files": [
+    "dist",
+    "LICENSE",
+    "NOTICE.md",
+    "README.md"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./shape-types": {
+      "types": "./dist/shape-types.d.ts",
+      "import": "./dist/shape-types.js"
+    },
+    "./snapshot/types": {
+      "types": "./dist/snapshot/types.d.ts",
+      "import": "./dist/snapshot/types.js"
+    },
+    "./snapshot/schema": {
+      "types": "./dist/snapshot/schema.d.ts",
+      "import": "./dist/snapshot/schema.js"
+    },
+    "./snapshot/version": {
+      "types": "./dist/snapshot/version.d.ts",
+      "import": "./dist/snapshot/version.js"
+    },
+    "./snapshot/api": {
+      "types": "./dist/snapshot/api.d.ts",
+      "import": "./dist/snapshot/api.js"
+    },
+    "./snapshot/identity": {
+      "types": "./dist/snapshot/identity.d.ts",
+      "import": "./dist/snapshot/identity.js"
+    },
+    "./snapshot/archive": {
+      "types": "./dist/snapshot/archive.d.ts",
+      "import": "./dist/snapshot/archive.js"
+    },
+    "./assets/manifest": {
+      "types": "./dist/assets/manifest.d.ts",
+      "import": "./dist/assets/manifest.js"
+    },
+    "./assets/texture-paths": {
+      "types": "./dist/assets/texture-paths.d.ts",
+      "import": "./dist/assets/texture-paths.js"
+    },
+    "./assets/asset-url": {
+      "types": "./dist/assets/asset-url.d.ts",
+      "import": "./dist/assets/asset-url.js"
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dutchdronesquad/track-viewer.git"
+  },
+  "homepage": "https://github.com/dutchdronesquad/track-viewer",
+  "bugs": "https://github.com/dutchdronesquad/track-viewer/issues",
+  "scripts": {
+    "build": "node ../../scripts/clean-dist.mjs && tsup && tsc -p tsconfig.build.json"
+  },
+  "dependencies": {
+    "@noble/hashes": "^2.4.0",
+    "fflate": "^0.8.3",
+    "zod": "^4.0.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org"
+  }
+}

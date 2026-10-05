@@ -123,3 +123,7 @@ Report bugs or request features in [GitHub Issues](https://github.com/dutchdrone
 [tests-shield]: https://github.com/dutchdronesquad/track-viewer/actions/workflows/tests.yaml/badge.svg
 [tests-url]: https://github.com/dutchdronesquad/track-viewer/actions/workflows/tests.yaml
 [types-shield]: https://img.shields.io/npm/types/@trackdraw/viewer.svg
+
+## Shared schema
+
+This repository contains two npm workspaces: `packages/schema` publishes `@trackdraw/schema` for portable snapshot types, validation, identity, archives and asset helpers; `packages/viewer` publishes `@trackdraw/viewer` for rendering. Data producers can use schema without installing a renderer. Existing viewer data subpaths remain available through viewer 1.x; see [Shared schema migration](docs/schema-migration.md). Both packages share a release version, with schema published first.

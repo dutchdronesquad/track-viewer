@@ -1,15 +1,18 @@
 import { describe, expect, it, vi } from "vitest";
 import { zipSync, unzipSync, strToU8 } from "fflate";
-import * as manifest from "../../src/assets/manifest";
+import * as manifest from "../../packages/schema/src/assets/manifest";
 import {
   createViewerArchive,
   createViewerArchiveWithCurrentAssets,
   readViewerArchive,
-} from "../../src/snapshot/archive";
-import { getViewerSnapshotId, sha256Hex } from "../../src/snapshot/identity";
-import { viewerSnapshotFromApi } from "../../src/snapshot/api";
+} from "../../packages/schema/src/snapshot/archive";
+import {
+  getViewerSnapshotId,
+  sha256Hex,
+} from "../../packages/schema/src/snapshot/identity";
+import { viewerSnapshotFromApi } from "../../packages/schema/src/snapshot/api";
 import { snapshotFixture } from "../helpers/snapshot";
-import type { TrackDrawViewerOptions } from "../../src/viewer-options";
+import type { TrackDrawViewerOptions } from "../../packages/viewer/src/viewer-options";
 
 function texturedFixture() {
   const bytes = new Uint8Array([1, 2, 3]);
@@ -65,16 +68,19 @@ describe("portable track archive", () => {
       readViewerArchive(zipSync({ "snapshot.json": new Uint8Array(4_000_001) }))
     ).toThrow(/large/);
   });
-  it("rejects changed track data and unsupported requirements", async () => {
+  it("rejects changed track data but leaves renderer compatibility to the viewer", async () => {
     const snapshot = snapshotFixture();
     snapshot.design.title = "tampered";
     await expect(
       createViewerArchive(snapshot, async () => new Uint8Array())
     ).rejects.toThrow(/hash/);
     snapshot.requiredViewer.minRendererVersion = "9.0.0";
-    await expect(
-      createViewerArchive(snapshot, async () => new Uint8Array())
-    ).rejects.toThrow(/unsupported/);
+    snapshot.snapshotId = getViewerSnapshotId(snapshot);
+    const bytes = await createViewerArchive(
+      snapshot,
+      async () => new Uint8Array()
+    );
+    expect(readViewerArchive(bytes).snapshot).toEqual(snapshot);
   });
 });
 

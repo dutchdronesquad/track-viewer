@@ -1,0 +1,69 @@
+{
+  "trackdraw-generic-gate": [],
+  "multigp-standard-gate-5x5": [
+    "/assets/models/textures/multigp-obstacles/MultiGP-2017-Airgate-left-panel-regular-50-percent.webp",
+    "/assets/models/textures/multigp-obstacles/MultiGP-2017-Airgate-right-panel-regular-50-percent.webp",
+    "/assets/models/textures/multigp-obstacles/MultiGP-2017-Airgate-top-regular-50-percent.webp"
+  ],
+  "multigp-championship-gate-7x6": [
+    "/assets/models/textures/multigp-obstacles/large-side-panel-multigp.webp",
+    "/assets/models/textures/multigp-obstacles/large-top-multigp.webp"
+  ],
+  "racegow-gate": [],
+  "trackdraw-generic-tower": [],
+  "multigp-tower-5x5": [
+    "/assets/models/textures/multigp-obstacles/MultiGP-2017-Airgate-left-panel-regular-50-percent.webp",
+    "/assets/models/textures/multigp-obstacles/MultiGP-2017-Airgate-right-panel-regular-50-percent.webp",
+    "/assets/models/textures/multigp-obstacles/MultiGP-2017-Airgate-top-regular-50-percent.webp"
+  ],
+  "multigp-tower-7x6": [
+    "/assets/models/textures/multigp-obstacles/large-side-panel-multigp.webp",
+    "/assets/models/textures/multigp-obstacles/large-top-multigp.webp"
+  ],
+  "multigp-double-gate-tower-5x5": [
+    "/assets/models/textures/multigp-obstacles/MultiGP-2017-Airgate-left-panel-regular-50-percent.webp",
+    "/assets/models/textures/multigp-obstacles/MultiGP-2017-Airgate-right-panel-regular-50-percent.webp",
+    "/assets/models/textures/multigp-obstacles/MultiGP-2017-Airgate-top-regular-50-percent.webp"
+  ],
+  "multigp-double-gate-tower-7x6": [
+    "/assets/models/textures/multigp-obstacles/large-side-panel-multigp.webp",
+    "/assets/models/textures/multigp-obstacles/large-top-multigp.webp"
+  ],
+  "trackdraw-generic-flag": [],
+  "multigp-corner-flag": [
+    "/assets/models/textures/multigp-obstacles/feather-banners-cobranded-multigp.webp",
+    "/assets/models/textures/multigp-obstacles/feather-banners-cobranded-multigp-back-double-sided.webp"
+  ],
+  "trackdraw-generic-cone": [],
+  "trackdraw-generic-label": [],
+  "trackdraw-generic-start-finish": [],
+  "trackdraw-generic-ladder": [],
+  "multigp-standard-ladder-5x5": [
+    "/assets/models/textures/multigp-obstacles/MultiGP-2017-Airgate-left-panel-regular-50-percent.webp",
+    "/assets/models/textures/multigp-obstacles/MultiGP-2017-Airgate-right-panel-regular-50-percent.webp",
+    "/assets/models/textures/multigp-obstacles/MultiGP-2017-Airgate-top-regular-50-percent.webp"
+  ],
+  "multigp-championship-ladder-7x6": [
+    "/assets/models/textures/multigp-obstacles/large-side-panel-multigp.webp",
+    "/assets/models/textures/multigp-obstacles/large-top-multigp.webp"
+  ],
+  "multigp-topless-ladder-7x6": [
+    "/assets/models/textures/multigp-obstacles/large-side-panel-multigp.webp",
+    "/assets/models/textures/multigp-obstacles/large-top-multigp.webp"
+  ],
+  "trackdraw-generic-dive-gate": [],
+  "multigp-dive-gate-7x6": [
+    "/assets/models/textures/multigp-obstacles/large-side-panel-multigp.webp",
+    "/assets/models/textures/multigp-obstacles/large-top-multigp.webp"
+  ],
+  "multigp-launch-gate-7x6": [
+    "/assets/models/textures/multigp-obstacles/large-side-panel-multigp.webp",
+    "/assets/models/textures/multigp-obstacles/large-top-multigp.webp"
+  ],
+  "trackdraw-generic-banner": [],
+  "trackdraw-generic-fence": [],
+  "trackdraw-generic-net": [],
+  "multigp-hurdle": [
+    "/assets/models/textures/multigp-obstacles/5x10-hurdle-multigp.webp"
+  ]
+}

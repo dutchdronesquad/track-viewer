@@ -3,12 +3,12 @@ import {
   createCatalogShapeDraft,
   getTrackElementCatalogEntry,
   RACEGOW_GATE_ELEMENT_ID,
-} from "../../src/lib/track/elements/catalog";
-import { getGateVisualSpec } from "../../src/lib/track/elements/visual";
-import { getPvcSetGate3DParts } from "../../src/lib/track/render3d-layout";
-import { getGate2DShape } from "../../src/lib/track/shape2d";
-import type { GateShape } from "../../src/types";
-import { RENDERER_CAPABILITIES } from "../../src/snapshot/version";
+} from "../../packages/viewer/src/lib/track/elements/catalog";
+import { getGateVisualSpec } from "../../packages/viewer/src/lib/track/elements/visual";
+import { getPvcSetGate3DParts } from "../../packages/viewer/src/lib/track/render3d-layout";
+import { getGate2DShape } from "../../packages/viewer/src/lib/track/shape2d";
+import type { GateShape } from "../../packages/viewer/src/types";
+import { RENDERER_CAPABILITIES } from "../../packages/viewer/src/snapshot/version";
 
 describe("RaceGOW gate support", () => {
   it("advertises RaceGOW renderer compatibility", () => {

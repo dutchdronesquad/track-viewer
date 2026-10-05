@@ -2,10 +2,10 @@
 import { act } from "react";
 import { createRoot } from "react-dom/client";
 import { expect, it, vi } from "vitest";
-import { MemoShape3D } from "../../src/viewer-3d/items/TrackItem3D";
-import { SCENE_3D_THEME } from "../../src/theme";
-import type { GateShape } from "../../src/types";
-vi.mock("../../src/viewer-3d/items/Gate3D", () => ({
+import { MemoShape3D } from "../../packages/viewer/src/viewer-3d/items/TrackItem3D";
+import { SCENE_3D_THEME } from "../../packages/viewer/src/theme";
+import type { GateShape } from "../../packages/viewer/src/types";
+vi.mock("../../packages/viewer/src/viewer-3d/items/Gate3D", () => ({
   Gate3D: ({ backColor }: { backColor?: string }) => (
     <div data-back={backColor} />
   ),
