@@ -153,6 +153,7 @@ function SelectionMarker3D({ shape }: { shape: Shape }) {
 
 function Shape3D({
   assetResolver,
+  gateBackColor,
   isPrimaryPolyline,
   isSelected,
   onSelect,
@@ -163,6 +164,7 @@ function Shape3D({
   theme,
 }: {
   assetResolver: AssetResolver;
+  gateBackColor?: string;
   isPrimaryPolyline: boolean;
   isSelected: boolean;
   onSelect: (event: ThreeEvent<MouseEvent>, shapeId: string) => void;
@@ -178,6 +180,7 @@ function Shape3D({
         <group onClick={(event) => onSelect(event, shape.id)}>
           <Gate3D
             assetResolver={assetResolver}
+            backColor={gateBackColor}
             shape={shape}
             selected={isSelected}
             outerRef={outerRef}
@@ -304,6 +307,7 @@ export const MemoShape3D = memo(
   Shape3D,
   (prev, next) =>
     prev.assetResolver === next.assetResolver &&
+    prev.gateBackColor === next.gateBackColor &&
     prev.shape === next.shape &&
     prev.isPrimaryPolyline === next.isPrimaryPolyline &&
     prev.isSelected === next.isSelected &&

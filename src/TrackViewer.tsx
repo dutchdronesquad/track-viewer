@@ -19,6 +19,8 @@ export function TrackViewer({
   onViewChange,
   assetsBaseUrl,
   assetResolver,
+  camera3D,
+  gateBackColors,
   unitSystem,
   theme = "light",
   labels,
@@ -109,6 +111,8 @@ export function TrackViewer({
                       theme={theme}
                       assetsBaseUrl={assetsBaseUrl}
                       assetResolver={assetResolver}
+                      camera={camera3D}
+                      gateBackColors={gateBackColors}
                       active={active3D}
                       onUnavailable={handle3DFailure}
                     />

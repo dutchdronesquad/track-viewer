@@ -44,6 +44,8 @@ import {
 } from "./shared-scene";
 import { AxisGizmoOverlay, FieldWatermark } from "./overlays";
 
+import type { ViewerCamera3D } from "../viewer-options";
+
 export interface TrackViewer3DHandle {
   screenshot: () => string;
 }
@@ -55,6 +57,8 @@ export interface TrackViewer3DProps {
   assetsBaseUrl?: string;
   assetResolver?: AssetResolver;
   active?: boolean;
+  camera?: ViewerCamera3D;
+  gateBackColors?: Readonly<Record<string, string>>;
   onUnavailable(): void;
 }
 
@@ -67,6 +71,8 @@ const TrackViewer3D = forwardRef<TrackViewer3DHandle, TrackViewer3DProps>(
       assetsBaseUrl,
       assetResolver: resolveAsset,
       active = true,
+      camera,
+      gateBackColors,
       onUnavailable,
     },
     ref
@@ -110,6 +116,7 @@ const TrackViewer3D = forwardRef<TrackViewer3DHandle, TrackViewer3DProps>(
           <Suspense key={shape.id} fallback={null}>
             <MemoShape3D
               assetResolver={assetResolver}
+              gateBackColor={gateBackColors?.[shape.id]}
               isPrimaryPolyline={primaryPolylineId === shape.id}
               isSelected={false}
               onSelect={handleShapeSelect}
@@ -118,7 +125,14 @@ const TrackViewer3D = forwardRef<TrackViewer3DHandle, TrackViewer3DProps>(
             />
           </Suspense>
         )),
-      [assetResolver, handleShapeSelect, primaryPolylineId, shapes, t]
+      [
+        assetResolver,
+        gateBackColors,
+        handleShapeSelect,
+        primaryPolylineId,
+        shapes,
+        t,
+      ]
     );
 
     return (
@@ -135,7 +149,7 @@ const TrackViewer3D = forwardRef<TrackViewer3DHandle, TrackViewer3DProps>(
           frameloop={active ? "always" : "never"}
           shadows="percentage"
           camera={{
-            position: [cx - 14, 18, cz + 20],
+            position: camera?.position ?? [cx - 14, 18, cz + 20],
             fov: 46,
             near: 0.1,
             far: 500,
@@ -192,7 +206,7 @@ const TrackViewer3D = forwardRef<TrackViewer3DHandle, TrackViewer3DProps>(
           <WheelBridge
             controlsRef={orbitControlsRef}
             enabled={!isMobile}
-            minDistance={8}
+            minDistance={camera?.minDistance ?? 8}
             maxDistance={Math.max(120, longest * 3)}
           />
           <OrbitGroundConstraint controlsRef={orbitControlsRef} />
@@ -206,9 +220,9 @@ const TrackViewer3D = forwardRef<TrackViewer3DHandle, TrackViewer3DProps>(
               enableDamping
               dampingFactor={0.08}
               screenSpacePanning
-              target={[cx, 0, cz]}
+              target={camera?.target ?? [cx, 0, cz]}
               maxPolarAngle={ORBIT_MAX_POLAR_ANGLE}
-              minDistance={8}
+              minDistance={camera?.minDistance ?? 8}
               maxDistance={Math.max(120, longest * 3)}
               mouseButtons={{
                 LEFT: THREE.MOUSE.ROTATE,
@@ -228,9 +242,9 @@ const TrackViewer3D = forwardRef<TrackViewer3DHandle, TrackViewer3DProps>(
               dampingFactor={0.08}
               enableZoom={false}
               screenSpacePanning
-              target={[cx, 0, cz]}
+              target={camera?.target ?? [cx, 0, cz]}
               maxPolarAngle={ORBIT_MAX_POLAR_ANGLE}
-              minDistance={8}
+              minDistance={camera?.minDistance ?? 8}
               maxDistance={Math.max(120, longest * 3)}
               mouseButtons={{
                 LEFT: THREE.MOUSE.ROTATE,

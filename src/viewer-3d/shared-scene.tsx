@@ -59,7 +59,8 @@ export function useDesignTextureWarmup(
 ) {
   useEffect(() => {
     for (const path of getDesignTexturePaths(shapes)) {
-      useTexture.preload(assetResolver(path));
+      const resolved = assetResolver(path);
+      if (!resolved.startsWith("blob:")) useTexture.preload(resolved);
     }
   }, [shapes, assetResolver]);
 }

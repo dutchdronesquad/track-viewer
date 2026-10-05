@@ -2,6 +2,7 @@ export type {
   TrackDrawViewerOptions,
   ViewerView,
   ViewerViewState,
+  ViewerCamera3D,
 } from "./viewer-options";
 export { createTrackDrawViewer, type TrackDrawViewerHandle } from "./mount";
 export type {

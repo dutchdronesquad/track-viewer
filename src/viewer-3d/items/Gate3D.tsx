@@ -4,8 +4,9 @@
 // resolve under a non-root asset URL prefix.
 
 "use client";
+import { withGateBackColor } from "./gate-back-color";
 
-import { useTexture } from "@react-three/drei";
+import { usePreviewTextures } from "./use-preview-textures";
 import {
   getEffectiveFlips,
   getEffectiveRotation,
@@ -61,7 +62,7 @@ function PanelFrameGateTexturePlanes({
   topPanelW: number;
   topPanelY: number;
 }) {
-  const [leftTexture, rightTexture, topTexture] = useTexture([
+  const [leftTexture, rightTexture, topTexture] = usePreviewTextures([
     assetResolver(textures.left),
     assetResolver(textures.right),
     assetResolver(textures.top ?? textures.left),
@@ -159,6 +160,15 @@ function PanelFrameGateTexturePlanes({
     overrideVersion,
     catalogId,
   ]);
+
+  useEffect(
+    () => () => {
+      panelTextures.left.texture.dispose();
+      panelTextures.right.texture.dispose();
+      panelTextures.top?.texture.dispose();
+    },
+    [panelTextures]
+  );
 
   useEffect(() => {
     if (!catalogId) return;
@@ -378,11 +388,13 @@ function PanelFrameGate3D({
 
 export function Gate3D({
   assetResolver,
+  backColor,
   selected = false,
   shape,
   outerRef,
 }: {
   assetResolver: AssetResolver;
+  backColor?: string;
   selected?: boolean;
   shape: GateShape;
   outerRef?: Ref<THREE.Group>;
@@ -391,7 +403,7 @@ export function Gate3D({
   const color = marker
     ? getTimingMarkerColor(marker)
     : (shape.color ?? "#3b82f6");
-  const visual = getGateVisualSpec(shape);
+  const visual = withGateBackColor(getGateVisualSpec(shape), backColor);
   const rot: [number, number, number] = [
     0,
     (-(shape.rotation + 180) * Math.PI) / 180,

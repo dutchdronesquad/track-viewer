@@ -5,7 +5,7 @@
 
 "use client";
 
-import { useTexture } from "@react-three/drei";
+import { usePreviewTextures } from "./use-preview-textures";
 import { Suspense, useMemo, type Ref } from "react";
 import * as THREE from "three";
 import { getCornerFlagLayout } from "../../lib/track/render3d-layout";
@@ -33,7 +33,7 @@ function TexturedCornerFlagPanel3D({
   panelDepth: number;
   selected: boolean;
 }) {
-  const [frontTexture, backTexture] = useTexture([
+  const [frontTexture, backTexture] = usePreviewTextures([
     frontTexturePath,
     backTexturePath,
   ]) as THREE.Texture[];
