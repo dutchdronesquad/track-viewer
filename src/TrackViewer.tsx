@@ -20,6 +20,7 @@ export function TrackViewer({
   assetsBaseUrl,
   assetResolver,
   camera3D,
+  show3DAxes,
   gateBackColors,
   unitSystem,
   theme = "light",
@@ -112,6 +113,7 @@ export function TrackViewer({
                       assetsBaseUrl={assetsBaseUrl}
                       assetResolver={assetResolver}
                       camera={camera3D}
+                      showGizmo={show3DAxes}
                       gateBackColors={gateBackColors}
                       active={active3D}
                       onUnavailable={handle3DFailure}

@@ -7,6 +7,7 @@ createTrackDrawViewer(container, {
   design,
   initialView: "3d",
   showViewControls: false,
+  show3DAxes: false,
   camera3D: { position: [5, 3, 12], target: [5, 1, 2.5], minDistance: 4 },
   gateBackColors: {
     "view-0": "#112233",
@@ -17,7 +18,7 @@ createTrackDrawViewer(container, {
 });
 ```
 
-`camera3D` supplies initial framing and the orbit target. Keep the same camera object when only artwork changes to retain the user's camera position. Omitting it preserves the existing field camera and zoom limits. Coordinates use the viewer's 3D world: X across the field, Y upwards and Z along the field.
+`camera3D` supplies initial framing and the orbit target. Keep the same camera object when only artwork changes to retain the user's camera position. Omitting it preserves the existing field camera and zoom limits. Set `show3DAxes: false` to hide the orientation overlay in a compact preview. Coordinates use the viewer's 3D world: X across the field, Y upwards and Z along the field.
 
 `gateBackColors` is a transient presentation override keyed by shape ID. It changes the solid panel material on panel-frame gates, preserves their front textures and does not alter the persisted design, catalog or snapshot schema. Only six-digit hexadecimal colours are accepted. Other gate variants retain their existing materials.
 
