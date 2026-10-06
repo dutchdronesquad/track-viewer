@@ -98,6 +98,11 @@ Use a modern browser with ES modules, ResizeObserver, and CSS nesting support. T
 
 Each viewer owns its theme and viewport. Styles are scoped to the viewer, and the package does not install account calls, analytics, or persistent browser storage. A 2D-only viewer does not mount a WebGL renderer or load 3D textures.
 
+## Related repositories
+
+- [TrackDraw](https://github.com/dutchdronesquad/trackdraw) — the browser-based FPV track designer for creating, sharing and exporting the race layouts displayed by this viewer.
+- [Track assets](https://github.com/dutchdronesquad/track-assets) — obstacle artwork collections, editable templates and the shared catalog textures used by TrackDraw and the viewer, with a [browser artwork designer](https://designer.trackdraw.app) for gate and flag sheets.
+
 ## Development and support
 
 See [Contributing](https://github.com/dutchdronesquad/track-viewer/blob/main/CONTRIBUTING.md) for local setup, validation commands, and dependency maintenance, and [Publishing](https://github.com/dutchdronesquad/track-viewer/blob/main/docs/publishing.md) for the release workflow.
