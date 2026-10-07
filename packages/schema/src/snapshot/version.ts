@@ -14,6 +14,13 @@ export function getRequiredViewer(
   const capabilities = new Set<string>();
   for (const shape of shapes) {
     capabilities.add(`shape:${shape.kind}`);
+    if (
+      shape.appearance?.source === "registry" &&
+      shape.appearance.templateId === "gate-standard-v1"
+    )
+      capabilities.add(
+        `appearance:${shape.appearance.source}:${shape.appearance.templateId}`
+      );
     const organization = shape.meta?.catalog?.snapshot.organization;
     if (organization) capabilities.add(`catalog:${organization.toLowerCase()}`);
   }

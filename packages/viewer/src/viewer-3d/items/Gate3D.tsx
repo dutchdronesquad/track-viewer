@@ -1,9 +1,16 @@
+"use client";
+import { PanelTextureBoundary } from "./PanelTextureBoundary";
 //
 // Copy of src/components/canvas/preview3d/items/Gate3D.tsx with every
 // useTexture() call routed through an assetResolver prop so textures
 // resolve under a non-root asset URL prefix.
 
-"use client";
+import { useShapeAppearance } from "../../appearance/context";
+import {
+  applyGateAppearance,
+  getAppearanceTemplate,
+} from "@trackdraw/schema/appearance/registry";
+import { IDENTITY_ASSET_RESOLVER } from "@trackdraw/schema/assets/asset-url";
 import { withGateBackColor } from "./gate-back-color";
 
 import { usePreviewTextures } from "./use-preview-textures";
@@ -356,22 +363,24 @@ function PanelFrameGate3D({
         />
       </mesh>
 
-      <Suspense fallback={null}>
-        <PanelFrameGateTexturePlanes
-          assetResolver={assetResolver}
-          catalogId={catalogId}
-          frontZ={frontZ}
-          h={h}
-          leftPanelWidth={leftPanelWidth}
-          leftPanelX={leftPanelX}
-          rightPanelWidth={rightPanelWidth}
-          rightPanelX={rightPanelX}
-          textures={visual.textures}
-          topPanelHeight={topPanelHeight}
-          topPanelW={topPanelW}
-          topPanelY={topPanelY}
-        />
-      </Suspense>
+      <PanelTextureBoundary key={JSON.stringify(visual.textures)}>
+        <Suspense fallback={null}>
+          <PanelFrameGateTexturePlanes
+            assetResolver={assetResolver}
+            catalogId={catalogId}
+            frontZ={frontZ}
+            h={h}
+            leftPanelWidth={leftPanelWidth}
+            leftPanelX={leftPanelX}
+            rightPanelWidth={rightPanelWidth}
+            rightPanelX={rightPanelX}
+            textures={visual.textures}
+            topPanelHeight={topPanelHeight}
+            topPanelW={topPanelW}
+            topPanelY={topPanelY}
+          />
+        </Suspense>
+      </PanelTextureBoundary>
 
       <mesh position={[0, h / 2, -panelDepth / 2 - 0.004]}>
         <planeGeometry args={[w, h]} />
@@ -403,7 +412,16 @@ export function Gate3D({
   const color = marker
     ? getTimingMarkerColor(marker)
     : (shape.color ?? "#3b82f6");
-  const visual = withGateBackColor(getGateVisualSpec(shape), backColor);
+  const appearance = useShapeAppearance(shape);
+  const base = getGateVisualSpec(shape);
+  const visual = withGateBackColor(
+    base.variant === "panel-frame" &&
+      appearance &&
+      getAppearanceTemplate(shape) === appearance.reference.templateId
+      ? applyGateAppearance(base, appearance, IDENTITY_ASSET_RESOLVER)
+      : base,
+    backColor
+  );
   const rot: [number, number, number] = [
     0,
     (-(shape.rotation + 180) * Math.PI) / 180,

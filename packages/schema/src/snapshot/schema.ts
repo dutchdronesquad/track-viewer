@@ -1,4 +1,8 @@
 import { z } from "zod";
+import {
+  appearanceReferenceSchema,
+  resolvedAppearanceSchema,
+} from "../appearance/registry.js";
 import { VIEWER_SNAPSHOT_SCHEMA } from "./types.js";
 import type { ViewerDesignSnapshot } from "./types.js";
 
@@ -17,6 +21,7 @@ const catalogIdentitySchema = z.object({
 const dimension = z.number().positive().max(100_000);
 const coordinate = z.number().min(-100_000).max(100_000);
 const base = {
+  appearance: appearanceReferenceSchema.optional(),
   id: z.string().min(1).max(256),
   name: z.string().max(1000).optional(),
   x: coordinate,
@@ -125,6 +130,7 @@ export const viewerDesignSnapshotSchema = z.object({
   }),
   design: z.object({
     version: z.literal(2),
+    appearances: z.array(resolvedAppearanceSchema).max(200).optional(),
     title: z.string(),
     field: z.object({
       width: dimension,

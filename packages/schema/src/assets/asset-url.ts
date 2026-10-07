@@ -9,6 +9,8 @@ export function createAssetResolver(baseUrl?: string): AssetResolver {
     return (path) => `${trimmed}${path}`;
   }
   return (path) => {
+    if (/^\/assets\/registry\/[a-z0-9-]+\/[A-Za-z0-9_-]+\.webp$/.test(path))
+      return `${OBSTACLE_ASSETS_URL}${path.slice("/assets/registry".length)}`;
     const match =
       /^\/assets\/models\/textures\/multigp-obstacles\/([a-zA-Z0-9_-]+\.webp)$/.exec(
         path

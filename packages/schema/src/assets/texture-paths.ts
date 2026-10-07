@@ -1,3 +1,7 @@
+import {
+  findShapeAppearance,
+  type ResolvedAppearance,
+} from "../appearance/registry.js";
 import catalogTextures from "./generated/catalog-textures.json";
 import type { Shape } from "../shape-types.js";
 
@@ -16,9 +20,17 @@ const placeableKinds = new Set([
 ]);
 
 /** Only the texture references used by this design; no rendering catalog dependency. */
-export function getDesignTexturePaths(shapes: readonly Shape[]): string[] {
+export function getDesignTexturePaths(
+  shapes: readonly Shape[],
+  appearances: readonly ResolvedAppearance[] = []
+): string[] {
   const paths = new Set<string>();
   for (const shape of shapes) {
+    const appearance = findShapeAppearance(shape, appearances);
+    if (appearance) {
+      Object.values(appearance.panels).forEach((path) => paths.add(path));
+      continue;
+    }
     const catalog = shape.meta?.catalog;
     if (!catalog || typeof catalog !== "object") continue;
     const identity = catalog as Record<string, unknown>;

@@ -1,3 +1,4 @@
+import { findShapeAppearance } from "../appearance/registry.js";
 import { unzipSync, zipSync, strFromU8, strToU8 } from "fflate";
 import { getDesignAssetManifest } from "../assets/manifest.js";
 import type { AssetResolver } from "../assets/asset-url.js";
@@ -21,7 +22,16 @@ export interface ViewerArchive {
 
 function checkedSnapshot(value: unknown): ViewerDesignSnapshot {
   const snapshot = validateViewerDesignSnapshot(value);
-  const expected = getDesignAssetManifest(snapshot.design.shapes);
+  const appearances = snapshot.design.appearances ?? [];
+  for (const shape of snapshot.design.shapes) {
+    if (!shape.appearance) continue;
+    const appearance = findShapeAppearance(shape, appearances);
+    if (!appearance)
+      throw new Error("Artwork must be resolved before portable export.");
+    if (appearance.usage.portable !== "allowed")
+      throw new Error("Artwork terms do not permit portable export.");
+  }
+  const expected = getDesignAssetManifest(snapshot.design.shapes, appearances);
   if (
     snapshot.assets.length !== expected.length ||
     expected.some((entry) => {
@@ -93,7 +103,29 @@ export async function createViewerArchiveWithCurrentAssets(
       sha256: sha256Hex(bytes),
     });
   }
-  const refreshed = { ...snapshot, assets };
+  const refreshed = {
+    ...snapshot,
+    assets,
+    design: {
+      ...snapshot.design,
+      ...(snapshot.design.appearances
+        ? {
+            appearances: snapshot.design.appearances.map((entry) => ({
+              ...entry,
+              assets: entry.assets.map((asset) => ({
+                ...asset,
+                sizeBytes:
+                  assets.find((current) => current.path === asset.path)
+                    ?.sizeBytes ?? asset.sizeBytes,
+                sha256:
+                  assets.find((current) => current.path === asset.path)
+                    ?.sha256 ?? asset.sha256,
+              })),
+            })),
+          }
+        : {}),
+    },
+  };
   refreshed.snapshotId = getViewerSnapshotId(refreshed);
   return createViewerArchive(refreshed, async (asset) =>
     content.get(asset.path)!
