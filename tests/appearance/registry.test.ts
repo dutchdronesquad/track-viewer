@@ -338,7 +338,7 @@ describe("Championship registry artwork", () => {
         (path) => path
       );
       expect(
-        original.textures.placement?.right.orientation.textureTopEdgeFaces
+        original.textures.placement?.right?.orientation?.textureTopEdgeFaces
       ).toBe("bottom");
     }
   });
