@@ -20,6 +20,12 @@ Embed interactive 2D and 3D FPV race tracks in your website or application. **@t
 - **Offline viewing** from `.tdviewer.zip` archives containing a track and its catalog textures.
 - **Self-contained integration** with scoped styles and no TrackDraw account or editor state required.
 
+<p align="center">
+  <img alt="The same FPV race circuit rendered by TrackDraw Viewer in a 2D track overview and an interactive 3D view" src="https://raw.githubusercontent.com/dutchdronesquad/track-viewer/main/docs/images/viewer-showcase.jpg" width="800">
+</p>
+
+_Example integration showing two viewer instances with the same track design. Your application controls the surrounding layout._
+
 ## Installation
 
 For an application with a JavaScript bundler:
@@ -84,6 +90,12 @@ For TrackDraw REST API responses, pass `response.data` through `viewerSnapshotFr
 
 The [integration guide](https://github.com/dutchdronesquad/track-viewer/blob/main/docs/integration.md) includes a validation example, mount options, external 2D/3D controls, and archive creation.
 
+### Shared schema
+
+Use `@trackdraw/schema` when you only need portable snapshot types, validation, identity, archives or asset helpers. It works without installing a renderer. This repository contains both packages in `packages/schema` and `packages/viewer`; they share a release version, with schema published first.
+
+Existing viewer data subpaths remain available through viewer 1.x. See [Shared schema migration](docs/schema-migration.md) for the migration guide.
+
 ## Offline viewing and assets
 
 A `.tdviewer.zip` archive carries `snapshot.json` and the catalog textures used by that track. Load it with `readViewerArchive`, then use `createViewerArchiveAssets` to provide an `assetResolver` to the viewer. Dispose of the asset URLs after destroying the viewer. The [integration guide](https://github.com/dutchdronesquad/track-viewer/blob/main/docs/integration.md#offline-track-archives) includes a complete example.
@@ -128,7 +140,3 @@ Report bugs or request features in [GitHub Issues](https://github.com/dutchdrone
 [tests-shield]: https://github.com/dutchdronesquad/track-viewer/actions/workflows/tests.yaml/badge.svg
 [tests-url]: https://github.com/dutchdronesquad/track-viewer/actions/workflows/tests.yaml
 [types-shield]: https://img.shields.io/npm/types/@trackdraw/viewer.svg
-
-## Shared schema
-
-This repository contains two npm workspaces: `packages/schema` publishes `@trackdraw/schema` for portable snapshot types, validation, identity, archives and asset helpers; `packages/viewer` publishes `@trackdraw/viewer` for rendering. Data producers can use schema without installing a renderer. Existing viewer data subpaths remain available through viewer 1.x; see [Shared schema migration](docs/schema-migration.md). Both packages share a release version, with schema published first.
