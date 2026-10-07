@@ -1,3 +1,4 @@
+import type { ResolvedAppearance } from "../appearance/registry.js";
 import textureManifest from "./generated/texture-manifest.json";
 import type { ViewerAssetManifestEntry } from "../snapshot/types.js";
 import type { Shape } from "../shape-types.js";
@@ -37,10 +38,14 @@ export function getAssetManifestEntry(
  * doesn't cover would be a silent, hard-to-detect break of that guarantee.
  */
 export function getDesignAssetManifest(
-  shapes: readonly Shape[]
+  shapes: readonly Shape[],
+  appearances: readonly ResolvedAppearance[] = []
 ): ViewerAssetManifestEntry[] {
-  return getDesignTexturePaths(shapes).map((path) => {
-    const entry = getAssetManifestEntry(path);
+  return getDesignTexturePaths(shapes, appearances).map((path) => {
+    const entry =
+      appearances
+        .flatMap((appearance) => appearance.assets)
+        .find((asset) => asset.path === path) ?? getAssetManifestEntry(path);
     if (!entry) {
       throw new Error(
         `Asset manifest is missing an entry for "${path}". Regenerate it with \`npm run assets:viewer-manifest\`.`

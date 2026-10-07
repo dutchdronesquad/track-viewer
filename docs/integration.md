@@ -106,3 +106,11 @@ Use a modern browser with ES modules, ResizeObserver, and CSS nesting support; W
 ## Shared data package
 
 Import new snapshot/asset helpers and types from `@trackdraw/schema`, including `viewerSnapshotFromApi`. Validate renderer compatibility with `assertViewerSnapshotSupported(snapshot)` from the viewer before mounting. Existing viewer data subpaths remain available through 1.x with the legacy archive support checks. See [Shared schema migration](schema-migration.md) for the producer adapter boundary and release order.
+
+## Registry artwork and offline archives
+
+`@trackdraw/schema/appearance/registry` owns source-aware shape references, validation, discovery, resolution and the standard-gate panel mapping. Only standard 5×5 panel-frame gates advertise `gate-standard-v1` compatibility. Keep the reference when metadata, artwork or a future source/template is unavailable; the renderer uses its existing geometry and a safe fallback.
+
+A `ViewerDesign` may include `appearances`, containing validated resolved mappings and usage metadata. Pass `archive.snapshot.design` unchanged to the viewer, together with `createViewerArchiveAssets(archive).assetResolver`. Cold offline rendering uses the embedded appearance mapping and panel bytes; texture warmup must not request the overridden MultiGP artwork. Keep the asset URLs alive until the viewer is destroyed.
+
+Archives require each requested appearance to be resolved and its portable permission to be `allowed`. The DDS collection permits this usage. Archive creation reports unavailable references and denied usage before producing a download, and stores current asset integrity data and attribution. Existing archives without appearances remain supported.

@@ -1,3 +1,4 @@
+import type { AppearanceReference } from "./appearance/registry.js";
 export type UUID = string;
 
 export type ShapeKind =
@@ -13,6 +14,7 @@ export type ShapeKind =
   | "barrier";
 
 export interface BaseShape {
+  appearance?: AppearanceReference;
   id: UUID;
   kind: ShapeKind;
   name?: string;

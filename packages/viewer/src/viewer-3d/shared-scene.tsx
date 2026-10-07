@@ -1,11 +1,11 @@
+"use client";
+import type { ResolvedAppearance } from "@trackdraw/schema/appearance/registry";
 //
 // Copy of src/components/canvas/preview3d/shared-scene.tsx with the
 // module-level eager whole-catalog texture preload removed (see
 // getDesignTexturePaths/useDesignTextureWarmup below for the design-scoped
 // replacement) and MemoShape3D sourced from this package's own item
 // components (threaded with an AssetResolver instead of raw absolute paths).
-
-"use client";
 
 import { Grid, useTexture } from "@react-three/drei";
 import { useFrame, useThree, type ThreeEvent } from "@react-three/fiber";
@@ -55,14 +55,15 @@ export function ScreenshotHelper({
  */
 export function useDesignTextureWarmup(
   shapes: readonly Shape[],
-  assetResolver: AssetResolver
+  assetResolver: AssetResolver,
+  appearances?: readonly ResolvedAppearance[]
 ) {
   useEffect(() => {
-    for (const path of getDesignTexturePaths(shapes)) {
+    for (const path of getDesignTexturePaths(shapes, appearances)) {
       const resolved = assetResolver(path);
       if (!resolved.startsWith("blob:")) useTexture.preload(resolved);
     }
-  }, [shapes, assetResolver]);
+  }, [shapes, assetResolver, appearances]);
 }
 
 function hexToRgba(hex: string): [number, number, number, number] {

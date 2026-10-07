@@ -3,6 +3,7 @@ import { defineConfig } from "tsup";
 export default defineConfig({
   entry: {
     index: "src/index.ts",
+    "appearance/registry": "src/appearance/registry.ts",
     "shape-types": "src/shape-types.ts",
     "snapshot/types": "src/snapshot/types.ts",
     "snapshot/schema": "src/snapshot/schema.ts",

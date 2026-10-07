@@ -90,7 +90,7 @@ const TrackViewer3D = forwardRef<TrackViewer3DHandle, TrackViewer3DProps>(
       () => getViewerPrimaryPolylineId(shapes),
       [shapes]
     );
-    useDesignTextureWarmup(shapes, assetResolver);
+    useDesignTextureWarmup(shapes, assetResolver, design.appearances);
     const isMobile = useIsTouchDevice();
     const t = SCENE_3D_THEME[theme];
     const cx = field.width / 2;

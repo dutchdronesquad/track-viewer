@@ -55,6 +55,10 @@
     "./assets/asset-url": {
       "types": "./dist/assets/asset-url.d.ts",
       "import": "./dist/assets/asset-url.js"
+    },
+    "./appearance/registry": {
+      "types": "./dist/appearance/registry.d.ts",
+      "import": "./dist/appearance/registry.js"
     }
   },
   "repository": {

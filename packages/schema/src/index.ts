@@ -8,3 +8,5 @@ export * from "./assets/manifest.js";
 export * from "./assets/texture-paths.js";
 export * from "./assets/asset-url.js";
 export type * from "./shape-types.js";
+
+export * from "./appearance/registry.js";

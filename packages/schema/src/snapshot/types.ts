@@ -1,3 +1,4 @@
+import type { ResolvedAppearance } from "../appearance/registry.js";
 import type { Shape } from "../shape-types.js";
 
 /** Portable public track contract shared by validation, archives and rendering. */
@@ -30,6 +31,7 @@ type PublicShape<T extends Shape> = T extends Shape
 export type ViewerShape = PublicShape<Shape>;
 
 export interface ViewerDesign {
+  appearances?: ResolvedAppearance[];
   version: 2;
   title: string;
   field: ViewerFieldSpec;
