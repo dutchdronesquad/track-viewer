@@ -13,6 +13,7 @@ export { isViewerCompatible } from "@trackdraw/schema/snapshot/version";
 export const RENDERER_CAPABILITIES = [
   "shape:gate",
   "appearance:registry:gate-standard-v1",
+  "appearance:registry:gate-championship-v1",
   "shape:tower",
   "shape:flag",
   "shape:cone",

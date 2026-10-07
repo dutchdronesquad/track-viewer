@@ -14,10 +14,7 @@ export function getRequiredViewer(
   const capabilities = new Set<string>();
   for (const shape of shapes) {
     capabilities.add(`shape:${shape.kind}`);
-    if (
-      shape.appearance?.source === "registry" &&
-      shape.appearance.templateId === "gate-standard-v1"
-    )
+    if (shape.appearance?.source === "registry")
       capabilities.add(
         `appearance:${shape.appearance.source}:${shape.appearance.templateId}`
       );

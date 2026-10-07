@@ -193,7 +193,7 @@ describe("public registry appearance contract", () => {
           },
         },
       })
-    ).toBeNull();
+    ).toBe("gate-championship-v1");
   });
   it("keeps geometry and applies printed-front orientation and solid backs", async () => {
     const base = getGateVisualSpec(gate());
@@ -258,5 +258,88 @@ describe("public registry appearance contract", () => {
     snapshot.snapshotId = getViewerSnapshotId(snapshot);
     await expect(createViewerArchive(snapshot, read)).rejects.toThrow(/permit/);
     expect(read).not.toHaveBeenCalled();
+  });
+});
+
+describe("Championship registry artwork", () => {
+  it("discovers and resolves independent side panels on the real Championship geometry", async () => {
+    const reference = {
+      ...ref,
+      textureId: "championship",
+      templateId: "gate-championship-v1",
+    };
+    const texture = {
+      id: reference.textureId,
+      name: "Championship",
+      template: reference.templateId,
+      panels: {
+        left: "/dds/championship-left.webp",
+        right: "/dds/championship-right.webp",
+        top: "/dds/championship-top.webp",
+      },
+    };
+    const fetcher = fixtureFetch({ textures: [texture] });
+    expect((await discoverAppearances(fetcher))[0].reference).toEqual(
+      reference
+    );
+    const entry = await resolveRegistryAppearance(reference, fetcher);
+    const shape = {
+      ...gate(),
+      width: 2.1336,
+      height: 1.8288,
+      appearance: reference,
+      meta: {
+        catalog: {
+          version: 1,
+          assignedKind: "gate",
+          elementId: "multigp-championship-gate-7x6",
+          official: true,
+          snapshot: {
+            name: "Championship",
+            organization: "MultiGP",
+            dimensionsLabel: "7 × 6 ft",
+          },
+        },
+      },
+    } as GateShape;
+    const base = getGateVisualSpec(shape);
+    if (base.variant !== "panel-frame")
+      throw new Error("Expected Championship geometry");
+    const visual = applyGateAppearance(base, entry, (path) => path);
+    expect(visual.panels.left.widthMeters).toBeCloseTo(0.4572);
+    expect(visual.panels.top.heightMeters).toBeCloseTo(0.6096);
+    expect(visual.textures.left).not.toEqual(visual.textures.right);
+    expect(visual.textures.placement?.right).toEqual({
+      source: "right",
+      orientation: { textureTopEdgeFaces: "top" },
+    });
+    const snapshot = snapshotFixture();
+    snapshot.design.shapes = [shape];
+    snapshot.design.appearances = [entry];
+    snapshot.assets = getDesignAssetManifest([shape], [entry]);
+    snapshot.snapshotId = getViewerSnapshotId(snapshot);
+    const archive = readViewerArchive(
+      await createViewerArchive(
+        validateViewerDesignSnapshot(snapshot),
+        async () => panelBytes
+      )
+    );
+    expect(archive.snapshot.design.appearances?.[0].reference).toEqual(
+      reference
+    );
+    expect(archive.assets.size).toBe(3);
+    for (const textureId of ["championship-gate", "championship-gate-red"]) {
+      const original = applyGateAppearance(
+        base,
+        {
+          ...entry,
+          reference: { ...reference, collectionId: "multigp", textureId },
+        },
+        (path) => path
+      );
+      expect(
+        original.textures.placement?.right?.orientation?.textureTopEdgeFaces
+      ).toBe("bottom");
+    }
   });
 });
