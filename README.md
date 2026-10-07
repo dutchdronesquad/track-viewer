@@ -40,7 +40,7 @@
 </p>
 
 <p align="center">
-  <img alt="The same FPV race circuit rendered by TrackDraw Viewer in a 2D track overview and an interactive 3D view" src="https://raw.githubusercontent.com/dutchdronesquad/track-viewer/main/docs/images/viewer-showcase.jpg" width="800">
+  <img alt="The same FPV race circuit rendered by TrackDraw Viewer in a 2D track overview and an interactive 3D view" src="https://raw.githubusercontent.com/dutchdronesquad/track-viewer/72aa6697425f41b9ccad764de8e474fcfa8ad04b/docs/images/viewer-showcase.jpg" width="800">
 </p>
 
 <p align="center">
