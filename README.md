@@ -15,7 +15,6 @@
 <p align="center">
   <a href="https://www.npmjs.com/package/@trackdraw/viewer"><img alt="npm version" src="https://img.shields.io/npm/v/@trackdraw/viewer.svg"></a>
   <a href="https://www.npmjs.com/package/@trackdraw/viewer"><img alt="npm downloads" src="https://img.shields.io/npm/dm/@trackdraw/viewer.svg"></a>
-  <a href="https://www.npmjs.com/package/@trackdraw/viewer"><img alt="Types" src="https://img.shields.io/npm/types/@trackdraw/viewer.svg"></a>
   <a href="LICENSE"><img alt="License" src="https://img.shields.io/github/license/dutchdronesquad/track-viewer.svg"></a>
   <img alt="Project stage" src="https://img.shields.io/badge/project%20stage-stable-green.svg">
   <img alt="Project maintenance" src="https://img.shields.io/maintenance/yes/2026.svg">
