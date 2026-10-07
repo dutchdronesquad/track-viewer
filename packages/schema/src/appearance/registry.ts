@@ -3,6 +3,8 @@ import type { Shape } from "../shape-types.js";
 import { sha256Hex } from "../snapshot/identity.js";
 import { OBSTACLE_ASSETS_URL } from "../assets/asset-url.js";
 
+const gateTemplates = new Set(["gate-standard-v1", "gate-championship-v1"]);
+
 const id = z
   .string()
   .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/)
@@ -65,7 +67,7 @@ export const resolvedAppearanceSchema = z
     const paths = new Set(Object.values(value.panels));
     if (
       value.reference.source !== "registry" ||
-      value.reference.templateId !== "gate-standard-v1" ||
+      !gateTemplates.has(value.reference.templateId) ||
       [...paths].some((path) => !path.startsWith(prefix)) ||
       value.assets.length !== paths.size ||
       value.assets.some((asset) => !paths.delete(asset.path)) ||
@@ -92,12 +94,20 @@ export function getAppearanceTemplate(shape: Shape): string | null {
   const catalog = shape.meta?.catalog as
     | { elementId?: unknown; assignedKind?: unknown; version?: unknown }
     | undefined;
-  return shape.kind === "gate" &&
-    catalog?.version === 1 &&
-    catalog.assignedKind === "gate" &&
-    catalog.elementId === "multigp-standard-gate-5x5"
-    ? "gate-standard-v1"
-    : null;
+  if (
+    shape.kind !== "gate" ||
+    catalog?.version !== 1 ||
+    catalog.assignedKind !== "gate"
+  )
+    return null;
+  switch (catalog.elementId) {
+    case "multigp-standard-gate-5x5":
+      return "gate-standard-v1";
+    case "multigp-championship-gate-7x6":
+      return "gate-championship-v1";
+    default:
+      return null;
+  }
 }
 export function findShapeAppearance(
   shape: Shape,
@@ -216,7 +226,7 @@ export async function discoverAppearances(
       ? result.value.textures
           .filter(
             (texture) =>
-              texture.template === "gate-standard-v1" &&
+              gateTemplates.has(texture.template) &&
               texture.panels.left &&
               texture.panels.right &&
               texture.panels.top
@@ -240,7 +250,7 @@ export async function resolveRegistryAppearance(
   fetchAsset: typeof fetch = fetch
 ): Promise<ResolvedAppearance> {
   appearanceReferenceSchema.parse(ref);
-  if (ref.source !== "registry" || ref.templateId !== "gate-standard-v1")
+  if (ref.source !== "registry" || !gateTemplates.has(ref.templateId))
     throw new Error("Unsupported artwork source or template.");
   const manifest = await readManifest(ref.collectionId!, fetchAsset);
   const texture = manifest.textures.find(
@@ -351,6 +361,14 @@ export function applyGateAppearance<
     textures: { left: string; right: string; top?: string };
   },
 >(visual: T, entry: ResolvedAppearance, resolve: (path: string) => string): T {
+  // Original MultiGP Championship sets share one side image; their right face
+  // retains the catalog rotation. Club sheets already contain front-view right artwork.
+  const originalChampionship =
+    entry.reference.collectionId === "multigp" &&
+    entry.reference.templateId === "gate-championship-v1" &&
+    ["championship-gate", "championship-gate-red"].includes(
+      entry.reference.textureId ?? ""
+    );
   return {
     ...visual,
     panels: {
@@ -374,7 +392,12 @@ export function applyGateAppearance<
       top: resolve(entry.panels.top),
       placement: {
         left: { source: "left", orientation: { textureTopEdgeFaces: "top" } },
-        right: { source: "right", orientation: { textureTopEdgeFaces: "top" } },
+        right: {
+          source: "right",
+          orientation: {
+            textureTopEdgeFaces: originalChampionship ? "bottom" : "top",
+          },
+        },
         top: { source: "top", orientation: { textureTopEdgeFaces: "top" } },
       },
     },

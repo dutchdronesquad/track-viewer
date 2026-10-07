@@ -109,7 +109,7 @@ Import new snapshot/asset helpers and types from `@trackdraw/schema`, including 
 
 ## Registry artwork and offline archives
 
-`@trackdraw/schema/appearance/registry` owns source-aware shape references, validation, discovery, resolution and the standard-gate panel mapping. Only standard 5×5 panel-frame gates advertise `gate-standard-v1` compatibility. Keep the reference when metadata, artwork or a future source/template is unavailable; the renderer uses its existing geometry and a safe fallback.
+`@trackdraw/schema/appearance/registry` owns source-aware shape references, validation, discovery, resolution and the gate panel mappings. Standard 5 × 5 ft panel-frame gates advertise `gate-standard-v1`; Championship 7 × 6 ft gates advertise `gate-championship-v1`. Club sheets use independent front-view left/right panels. Original MultiGP Championship normal/red artwork retains its shared side-image rotation. Keep the reference when metadata, artwork or a future source/template is unavailable; the renderer uses its existing geometry and a safe fallback.
 
 A `ViewerDesign` may include `appearances`, containing validated resolved mappings and usage metadata. Pass `archive.snapshot.design` unchanged to the viewer, together with `createViewerArchiveAssets(archive).assetResolver`. Cold offline rendering uses the embedded appearance mapping and panel bytes; texture warmup must not request the overridden MultiGP artwork. Keep the asset URLs alive until the viewer is destroyed.
 
