@@ -55,13 +55,22 @@ export function Develop() {
   return (
     <div className="developer">
       <header className="developer-nav">
-        <a href="/">
-          <img src={logo} alt="TrackDraw" width={180} height={35} />
-        </a>
-        <nav aria-label="Developer navigation">
-          <a href="/">Showcase</a>
-          <a href="/scenarios">Scenario tools ↗</a>
-        </nav>
+        <div className="developer-nav-inner">
+          <a href="/">
+            <img src={logo} alt="TrackDraw" width={180} height={35} />
+          </a>
+          <nav aria-label="Developer navigation">
+            <a href="/">Showcase</a>
+            <a href="/scenarios">Scenario tools ↗</a>
+            <a
+              href="https://github.com/dutchdronesquad/track-viewer"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              GitHub ↗
+            </a>
+          </nav>
+        </div>
       </header>
       <main className="developer-main">
         <div className="developer-intro">

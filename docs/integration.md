@@ -1,5 +1,7 @@
 # Integration guide
 
+Try the [live demo](https://viewer.trackdraw.app/) for practical website embeds and the [developer examples](https://viewer.trackdraw.app/develop) for live previews, copyable HTML/JavaScript and sample tracks. These examples follow the current development source and may include options not yet available in the latest npm release.
+
 ## Simple website embed
 
 Use `mountTrack` from `@trackdraw/viewer` to load a public snapshot or archive and show it in an existing element. It includes snapshot validation, renderer compatibility checks and archive texture cleanup. This API follows development source and will be available in the next npm release; use `createTrackDrawViewer` with current releases until then.
