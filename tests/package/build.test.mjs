@@ -14,7 +14,7 @@ import { fileURLToPath } from "node:url";
 import { runInNewContext } from "node:vm";
 import { init, parse } from "es-module-lexer";
 
-await init;
+await init();
 
 const root = fileURLToPath(new URL("../..", import.meta.url));
 const viewerRoot = path.join(root, "packages/viewer");
@@ -39,9 +39,9 @@ function graph(entry, packageRoot = viewerRoot) {
     const map = JSON.parse(readFileSync(`${file}.map`, "utf8"));
     for (const source of map.sources) sources.add(source);
     for (const specifier of parse(code)[0]) {
-      if (specifier.d === -2) continue; // import.meta
-      assert.ok(specifier.n, `Nonliteral import in ${file}`);
-      const name = specifier.n;
+      if (specifier.type === "import-meta") continue;
+      assert.ok(specifier.specifier, `Nonliteral import in ${file}`);
+      const name = specifier.specifier;
       if (name.startsWith(".")) visit(path.resolve(path.dirname(file), name));
       else if (
         name === "@trackdraw/schema" ||
