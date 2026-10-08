@@ -20,7 +20,7 @@ After publishing, verify the demo identity, qualifying/final switching, 2D/3D co
 
 ## GitHub deployment
 
-`.github/workflows/demo.yml` deploys through the GitHub environment `cf-demo` and can run manually with `workflow_dispatch`. Configure environment variable `CLOUDFLARE_ACCOUNT_ID` and environment secret `CLOUDFLARE_API_TOKEN` for the intended account, using the [Edit Cloudflare Workers API token template](https://developers.cloudflare.com/workers/ci-cd/external-cicd/github-actions/) scoped to the intended account and the `trackdraw.app` zone. Never copy a local OAuth credential into CI. Environment protection rules can gate publishing independently of package releases.
+`.github/workflows/demo.yml` deploys through the GitHub environment `cf-demo` and can run manually with `workflow_dispatch`. Configure repository secrets `CLOUDFLARE_ACCOUNT_ID` and `CLOUDFLARE_API_TOKEN` for the intended account, using the [Edit Cloudflare Workers API token template](https://developers.cloudflare.com/workers/ci-cd/external-cicd/github-actions/) scoped to the intended account and the `trackdraw.app` zone. Never copy a local OAuth credential into CI. Environment protection rules can gate publishing independently of package releases.
 
 Pushes to `main` publish automatically through `cf-demo`. Configure its deployment credentials before merging the demo workflow. Deployments run typecheck, lint and tests before building; concurrent publishes are serialized. Pull requests validate the minified site and Wrangler dry-run but do not publish.
 
