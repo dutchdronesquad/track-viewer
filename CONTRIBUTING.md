@@ -29,6 +29,10 @@ Declarations are emitted with `tsc -p tsconfig.build.json`, separately from tsup
 
 **Vendored, not shared, source.** Files under `packages/viewer/src/lib/` and `packages/viewer/src/components/` originated as copies of pure/leaf logic from the trackdraw app (`src/lib/track/*`, `src/components/canvas/*`, `src/hooks/*`) — not re-exports or a shared module. They will not automatically pick up future changes to trackdraw's originals; keep them in sync manually if the app's copy changes in a way that matters for rendering fidelity. A few app-only exports were intentionally dropped during vendoring (e.g. `design.ts`'s serialize/normalize/create functions, which pulled in map-reference and inventory-planning code this read-only viewer never needs) — see the file-level comments on the trimmed copies.
 
+## Presentation validation
+
+After building, serve the repository over HTTP and open [the transparent presentation example](examples/presentation.html). Check the small, large, elongated and rotated obstacles on light/dark page backgrounds and a narrow container. Orbit, zoom and reset; the alpha inspector reports clear, opaque and antialiased pixel counts plus an image signature that should return after reset. Exercise the explicit WebGL fallback. Before release, also validate one-finger orbit and two-finger pinch/zoom on a touch device; resizing a desktop viewport alone does not prove touch behavior.
+
 ## Dependency updates
 
 [Renovate](.github/renovate.json) extends the shared [Dutch Drone Squad dependency policy](https://github.com/dutchdronesquad/.github/blob/main/renovate-base.json). Scheduling, labels, the dependency dashboard, GitHub Actions digest pinning and minor/patch automerge, and automated lock-file maintenance are maintained centrally.

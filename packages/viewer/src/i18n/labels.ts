@@ -7,6 +7,9 @@ export interface TrackViewerLabels {
     grid: (gridLabel: string) => string;
     viewerPanZoom: string;
     fitToWindow: string;
+    resetOverview?: string;
+    loading3D?: string;
+    unavailable3D?: string;
   };
 }
 
@@ -15,6 +18,9 @@ export const DEFAULT_VIEWER_LABELS: TrackViewerLabels = {
     grid: (gridLabel) => `Grid ${gridLabel}`,
     viewerPanZoom: "Drag to pan, wheel to zoom",
     fitToWindow: "Fit to window",
+    resetOverview: "Reset overview",
+    loading3D: "Loading 3D track…",
+    unavailable3D: "3D is unavailable. Showing the 2D track instead.",
   },
 };
 

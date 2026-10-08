@@ -6,6 +6,8 @@ import type { TrackDrawViewerOptions } from "./viewer-options";
 export interface TrackDrawViewerHandle {
   /** Re-renders with new options (e.g. after refreshing a snapshot). */
   update(options: TrackDrawViewerOptions): void;
+  /** Restore the canonical fitted overview in transparent presentation. */
+  resetOverview(): void;
   /** Unmounts and releases the React root. */
   destroy(): void;
 }
@@ -19,11 +21,20 @@ export function createTrackDrawViewer(
   options: TrackDrawViewerOptions
 ): TrackDrawViewerHandle {
   const root: Root = createRoot(container);
-  root.render(createElement(TrackViewer, options));
+  let current = options;
+  let resetRevision = 0;
+  const render = () =>
+    root.render(createElement(TrackViewer, { ...current, resetRevision }));
+  render();
 
   return {
     update(next) {
-      root.render(createElement(TrackViewer, next));
+      current = next;
+      render();
+    },
+    resetOverview() {
+      resetRevision++;
+      render();
     },
     destroy() {
       root.unmount();

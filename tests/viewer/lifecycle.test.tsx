@@ -12,9 +12,24 @@ vi.mock("../../packages/viewer/src/viewer-2d/TrackViewer2D", () => ({
   default: () => <div data-view="2d" />,
 }));
 vi.mock("../../packages/viewer/src/viewer-3d/TrackViewer3D", () => ({
-  default: ({ active }: { active: boolean }) => {
+  default: ({
+    active,
+    presentation,
+    resetRevision,
+  }: {
+    active: boolean;
+    presentation?: boolean;
+    resetRevision?: string;
+  }) => {
     if (state.fail) throw new Error("WebGL initialization failed");
-    return <div data-view="3d" data-active={String(active)} />;
+    return (
+      <div
+        data-view="3d"
+        data-active={String(active)}
+        data-presentation={String(presentation)}
+        data-reset={resetRevision}
+      />
+    );
   },
 }));
 
@@ -181,6 +196,65 @@ describe("host controls", () => {
     expect(
       container.querySelector('button[aria-pressed="true"]')?.textContent
     ).toBe("2D");
+    await act(async () => handle.destroy());
+  });
+});
+
+describe("transparent presentation", () => {
+  it("defaults to frameless 3D with overlay and host reset, and keeps update options", async () => {
+    const container = document.createElement("div");
+    document.body.append(container);
+    let handle!: ReturnType<typeof createTrackDrawViewer>;
+    await act(async () => {
+      handle = createTrackDrawViewer(container, {
+        design: snapshotFixture().design,
+        presentation: "transparent",
+      });
+    });
+    expect(container.querySelector("[data-viewer-toolbar]")).toBeNull();
+    expect(
+      container.querySelector<HTMLElement>(".trackdraw-viewer")?.style
+        .background
+    ).toBe("transparent");
+    const scene = () => container.querySelector('[data-view="3d"]');
+    expect(scene()?.getAttribute("data-active")).toBe("true");
+    expect(scene()?.getAttribute("data-presentation")).toBe("true");
+    const revision = scene()?.getAttribute("data-reset");
+    await act(async () => handle.resetOverview());
+    expect(scene()?.getAttribute("data-reset")).not.toBe(revision);
+    const next = scene()?.getAttribute("data-reset");
+    await act(async () =>
+      (container.querySelector("button") as HTMLButtonElement).click()
+    );
+    expect(scene()?.getAttribute("data-reset")).not.toBe(next);
+    await act(async () =>
+      handle.update({
+        design: snapshotFixture().design,
+        presentation: "transparent",
+        showResetControl: false,
+      })
+    );
+    expect(container.querySelector("button")).toBeNull();
+    await act(async () => handle.resetOverview());
+    expect(scene()?.getAttribute("data-presentation")).toBe("true");
+    await act(async () => handle.destroy());
+  });
+  it("explains transparent 3D fallback without a blank scene", async () => {
+    const container = document.createElement("div");
+    document.body.append(container);
+    let handle!: ReturnType<typeof createTrackDrawViewer>;
+    await act(async () => {
+      handle = createTrackDrawViewer(container, {
+        design: snapshotFixture().design,
+        presentation: "transparent",
+        forceWebglUnsupported: true,
+      });
+    });
+    expect(container.querySelector('[role="status"]')?.textContent).toContain(
+      "Showing the 2D track"
+    );
+    expect(container.querySelector('[data-view="3d"]')).toBeNull();
+    expect(container.querySelector('[data-view="2d"]')).not.toBeNull();
     await act(async () => handle.destroy());
   });
 });

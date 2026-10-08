@@ -127,3 +127,25 @@ Report bugs or request features in [GitHub Issues](https://github.com/dutchdrone
 ## Shared schema
 
 This repository contains two npm workspaces: `packages/schema` publishes `@trackdraw/schema` for portable snapshot types, validation, identity, archives and asset helpers; `packages/viewer` publishes `@trackdraw/viewer` for rendering. Data producers can use schema without installing a renderer. Existing viewer data subpaths remain available through viewer 1.x; see [Shared schema migration](https://github.com/dutchdronesquad/track-viewer/blob/main/docs/schema-migration.md). Both packages share a release version, with schema published first.
+
+## Transparent 3D presentation
+
+Mount a floating, interactive course directly on a light or dark host background:
+
+```js
+import { createTrackDrawViewer } from "@trackdraw/viewer";
+import "@trackdraw/viewer/static/trackdraw-viewer.css";
+
+const viewer = createTrackDrawViewer(document.querySelector("#course"), {
+  design: snapshot.design,
+  presentation: "transparent",
+});
+// Give #course a height (for example 420px). Optional host-owned reset button:
+document.querySelector("#reset").onclick = () => viewer.resetOverview();
+```
+
+`presentation` defaults to `"framed"`, preserving existing 2D/3D embeds. `"transparent"` defaults to 3D, hides the toolbar and axes, and shows a minimal accessible **Reset overview** button. Override `showViewControls`, `show3DAxes`, and `showResetControl` independently; use `showResetControl: false` when supplying host controls. Host framing remains host-owned. The viewer's styles remain scoped to `.trackdraw-viewer`.
+
+The alpha-transparent WebGL canvas retains the bounded field plate, obstacles, textures and racing line, without sky, fog or surrounding terrain. Its canonical 46° perspective overview uses direction `[-14, 18, 20]` and 15% padding, matching TrackDraw's transparent PNG export. Actual scene bounds (including obstacle height) and the container aspect ratio determine target and distance. Loading geometry, design updates, resizing and `resetOverview()` refit the course. Orbit and zoom remain interactive on desktop and touch. The canonical preset takes precedence over `camera3D` in this mode.
+
+If WebGL is unavailable or fails, the viewer displays the existing 2D fallback with an accessible explanation. `onViewStateChange` reports the effective view for host controls. Loading, fallback and reset copy can be customized through `labels.loading3D`, `labels.unavailable3D`, and `labels.resetOverview`. A fallback is a normal 2D canvas, rather than a transparent 3D scene.
