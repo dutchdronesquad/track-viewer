@@ -9,7 +9,7 @@ import { recipes, recipeCode, downloadSample, eventTracks } from "./examples";
 import logo from "./assets/trackdraw-logo-color-darkbg.svg";
 import "./develop.css";
 
-declare const __LAB_DEV__: boolean;
+declare const __DEMO_DEV__: boolean;
 export function Develop() {
   const [selected, select] = useState(
     () =>
@@ -28,7 +28,7 @@ export function Develop() {
   const [copied, setCopied] = useState("");
   useEffect(() => {
     document.title = "TrackDraw · Developer examples";
-    if (!__LAB_DEV__) return;
+    if (!__DEMO_DEV__) return;
     const stream = new EventSource("/__reload");
     stream.onmessage = () => location.reload();
     return () => stream.close();
@@ -60,7 +60,7 @@ export function Develop() {
         </a>
         <nav aria-label="Developer navigation">
           <a href="/">Showcase</a>
-          <a href="/?mode=lab">Scenario tools ↗</a>
+          <a href="/?mode=scenarios">Scenario tools ↗</a>
         </nav>
       </header>
       <main className="developer-main">
@@ -265,8 +265,8 @@ export function Develop() {
               <h3>Bring your own track</h3>
               <p>
                 Export a viewer snapshot or .tdviewer.zip from TrackDraw. Use
-                the <a href="/?mode=lab">scenario tools</a> to check it locally
-                before integrating. Keep API credentials on your server.
+                the <a href="/?mode=scenarios">scenario tools</a> to check it
+                locally before integrating. Keep API credentials on your server.
               </p>
               <details>
                 <summary>Load an offline archive</summary>

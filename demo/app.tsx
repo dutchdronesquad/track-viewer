@@ -10,7 +10,7 @@ import {
   defaults,
   readState,
   stateQuery,
-  type LabState,
+  type ScenarioState,
 } from "./state";
 import "./app.css";
 import { Preview } from "./preview";
@@ -19,7 +19,7 @@ import { Develop } from "./develop";
 
 import { importTrack, type ImportedTrack } from "./import-track";
 
-declare const __LAB_DEV__: boolean;
+declare const __DEMO_DEV__: boolean;
 
 function App() {
   const [state, setState] = useState(() => readState(location.search));
@@ -42,7 +42,7 @@ function App() {
     history.replaceState(
       null,
       "",
-      `${location.pathname}?mode=lab&${stateQuery(state)}`
+      `${location.pathname}?mode=scenarios&${stateQuery(state)}`
     );
   }, [state]);
   // Preview children tear down their React roots before archive object URLs are revoked.
@@ -54,7 +54,7 @@ function App() {
     [imported]
   );
   useEffect(() => {
-    if (!__LAB_DEV__) return;
+    if (!__DEMO_DEV__) return;
     const source = new EventSource("/__reload");
     source.onmessage = () => location.reload();
     return () => {
@@ -87,8 +87,10 @@ function App() {
       trigger?.focus();
     };
   }, [settings]);
-  const patch = <K extends keyof LabState>(key: K, value: LabState[K]) =>
-    setState((s) => ({ ...s, [key]: value }));
+  const patch = <K extends keyof ScenarioState>(
+    key: K,
+    value: ScenarioState[K]
+  ) => setState((s) => ({ ...s, [key]: value }));
   const scenario = scenarios.find((s) => s.id === state.scenario)!;
   const design = imported?.design ?? scenario.design;
   const options: TrackDrawViewerOptions = {
@@ -184,7 +186,8 @@ function App() {
     }
     const url = new URL(location.href);
     url.search =
-      "mode=lab&" + stateQuery({ ...state, clean: clean ? "on" : state.clean });
+      "mode=scenarios&" +
+      stateQuery({ ...state, clean: clean ? "on" : state.clean });
     try {
       await navigator.clipboard.writeText(url.href);
       setNotice("Preview URL copied.");
@@ -199,12 +202,12 @@ function App() {
     setNotice("");
     patch("scenario", id);
   };
-  const select = <K extends keyof LabState>(key: K, title: string) => (
+  const select = <K extends keyof ScenarioState>(key: K, title: string) => (
     <label className="setting" key={key}>
       <span>{title}</span>
       <select
         value={state[key]}
-        onChange={(e) => patch(key, e.target.value as LabState[K])}
+        onChange={(e) => patch(key, e.target.value as ScenarioState[K])}
       >
         {choices[key].map((value) => (
           <option key={value} value={value}>
@@ -216,12 +219,12 @@ function App() {
   );
   const groups = ["Tracks", "Items", "Edge cases"];
   return (
-    <div className={`lab ${state.clean === "on" ? "clean" : ""}`}>
+    <div className={`scenarios ${state.clean === "on" ? "clean" : ""}`}>
       <header className="header" inert={settings}>
-        <a className="brand" href="/" aria-label="TrackDraw Visual Lab home">
+        <a className="brand" href="/" aria-label="TrackDraw Demo home">
           <span className="brand-symbol">↗</span>
           <strong>
-            TrackDraw<span> / Visual Lab</span>
+            TrackDraw<span> / Demo</span>
           </strong>
         </a>
         <span className="dev-badge">DEVELOPMENT</span>
@@ -288,7 +291,7 @@ function App() {
             </section>
           ))}
           <div className="sidebar-note">
-            Local lab · public viewer API
+            Scenario tools · public viewer API
             <br />
             No account or editor state.
           </div>
@@ -445,14 +448,16 @@ function App() {
       )}
       {state.clean === "on" && (
         <button className="exit-clean" onClick={() => patch("clean", "off")}>
-          Back to lab
+          Back to scenarios
         </button>
       )}
     </div>
   );
 }
 createRoot(document.getElementById("root")!).render(
-  new URLSearchParams(location.search).get("mode") === "lab" ? (
+  ["scenarios", "lab"].includes(
+    new URLSearchParams(location.search).get("mode") ?? ""
+  ) ? (
     <App />
   ) : new URLSearchParams(location.search).get("mode") === "develop" ? (
     <Develop />

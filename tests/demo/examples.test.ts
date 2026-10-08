@@ -6,7 +6,7 @@ import {
   recipes,
   recipeCode,
   sampleSnapshot,
-} from "../../lab/examples";
+} from "../../demo/examples";
 
 describe("developer integration recipes", () => {
   it("exports compatible sample tracks for every practical example", () => {

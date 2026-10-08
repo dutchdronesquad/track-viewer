@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { scenarios } from "../../lab/scenarios";
-import { defaults, readState, stateQuery } from "../../lab/state";
+import { scenarios } from "../../demo/scenarios";
+import { defaults, readState, stateQuery } from "../../demo/state";
 import { createCatalogShapeDraft } from "../../packages/viewer/src/lib/track/elements/catalog";
 import {
   validateViewerDesignSnapshot,
@@ -9,7 +9,7 @@ import {
   getRequiredViewer,
 } from "@trackdraw/schema";
 
-describe("visual lab fixtures", () => {
+describe("demo fixtures", () => {
   it("shows the circuit ladder with standard openings and ground clearance", () => {
     const standard = createCatalogShapeDraft("trackdraw-generic-ladder", {
       x: 0,

@@ -4,16 +4,16 @@ import { createServer } from "node:http";
 import path from "node:path";
 const root = path.resolve(import.meta.dirname, "..");
 const building = process.argv.includes("--build");
-const output = path.join(root, building ? "lab/dist" : "lab/.dev");
+const output = path.join(root, building ? "demo/dist" : "demo/.dev");
 if (building) await rm(output, { recursive: true, force: true });
 await mkdir(output, { recursive: true });
 await copyFile(
-  path.join(root, "lab/index.html"),
+  path.join(root, "demo/index.html"),
   path.join(output, "index.html")
 );
 if (building)
   await copyFile(
-    path.join(root, "lab/_headers"),
+    path.join(root, "demo/_headers"),
     path.join(output, "_headers")
   );
 await copyFile(
@@ -23,7 +23,7 @@ await copyFile(
 const clients = new Set();
 const options = {
   absWorkingDir: root,
-  entryPoints: ["lab/app.tsx"],
+  entryPoints: ["demo/app.tsx"],
   bundle: true,
   loader: { ".svg": "dataurl" },
   splitting: true,
@@ -33,7 +33,7 @@ const options = {
   minify: building,
   target: "es2022",
   define: {
-    __LAB_DEV__: JSON.stringify(!building),
+    __DEMO_DEV__: JSON.stringify(!building),
     "process.env.NODE_ENV": JSON.stringify(
       building ? "production" : "development"
     ),
@@ -95,8 +95,8 @@ const server = createServer(async (req, res) => {
     res.writeHead(404).end("Not found");
   }
 });
-server.listen(Number(process.env.LAB_PORT ?? 5180), "127.0.0.1", () =>
-  console.log(`Visual lab: http://localhost:${server.address().port}`)
+server.listen(Number(process.env.DEMO_PORT ?? 5180), "127.0.0.1", () =>
+  console.log(`Demo: http://localhost:${server.address().port}`)
 );
 for (const signal of ["SIGINT", "SIGTERM"])
   process.on(signal, async () => {

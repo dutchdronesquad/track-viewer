@@ -14,7 +14,6 @@ concurrency:
 
 jobs:
   deploy:
-    if: github.event_name == 'workflow_dispatch' || vars.DEMO_DEPLOY_ENABLED == 'true'
     name: Deploy demo
     environment:
       name: cf-demo

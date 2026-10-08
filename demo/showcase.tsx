@@ -16,7 +16,7 @@ import logoDark from "./assets/trackdraw-logo-color-darkbg.svg";
 import logoLight from "./assets/trackdraw-logo-color-lightbg.svg";
 import { eventTracks } from "./examples";
 
-declare const __LAB_DEV__: boolean;
+declare const __DEMO_DEV__: boolean;
 const circuit = scenarios.find((scene) => scene.id === "circuit")!.design;
 const items: {
   id: TrackElementCatalogId;
@@ -109,7 +109,7 @@ export function Showcase() {
   );
   const [gateBack, setGateBack] = useState("original");
   useEffect(() => {
-    if (!__LAB_DEV__) return;
+    if (!__DEMO_DEV__) return;
     const stream = new EventSource("/__reload");
     stream.onmessage = () => location.reload();
     return () => stream.close();

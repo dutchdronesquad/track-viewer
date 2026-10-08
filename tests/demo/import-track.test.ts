@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { importTrack } from "../../lab/import-track";
-import { scenarios } from "../../lab/scenarios";
+import { importTrack } from "../../demo/import-track";
+import { scenarios } from "../../demo/scenarios";
 import {
   createViewerArchive,
   VIEWER_SNAPSHOT_SCHEMA,
@@ -12,12 +12,12 @@ import {
 const design = scenarios.find((s) => s.id === "empty")!.design;
 const snapshot = {
   schema: VIEWER_SNAPSHOT_SCHEMA,
-  snapshotId: "lab-import",
+  snapshotId: "demo-import",
   requiredViewer: getRequiredViewer(design.shapes),
   design,
   assets: [],
 };
-describe("lab local imports", () => {
+describe("demo local imports", () => {
   it("reads JSON and rejects malformed or incompatible snapshots", async () => {
     const track = await importTrack(
       new File([JSON.stringify(snapshot)], "track.json"),

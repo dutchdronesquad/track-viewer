@@ -3,5 +3,5 @@ dist/
 coverage/
 .DS_Store
 *.log
-lab/.dev/
+demo/.dev/
 .wrangler/

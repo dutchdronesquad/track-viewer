@@ -84,7 +84,7 @@ const obstacleShapes: ViewerShape[] = [
     x: 30,
     y: 20,
     rotation: 0,
-    text: "TRACKDRAW • FLIGHT LAB",
+    text: "TRACKDRAW • DEMO TRACK",
     fontSize: 20,
   },
   {

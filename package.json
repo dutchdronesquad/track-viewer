@@ -20,10 +20,10 @@
     "test:watch": "vitest",
     "test:package": "node --test tests/package/*.test.mjs",
     "assets:catalog-manifest": "node scripts/generate-catalog-textures.mjs",
-    "dev:lab": "npm run build && node scripts/lab.mjs",
-    "build:lab": "npm run build && node scripts/lab.mjs --build",
-    "preview:demo": "npm run build:lab && wrangler dev --config wrangler.demo.jsonc",
-    "deploy:demo": "npm run build:lab && wrangler deploy --config wrangler.demo.jsonc"
+    "dev:demo": "npm run build && node scripts/demo.mjs",
+    "build:demo": "npm run build && node scripts/demo.mjs --build",
+    "preview:demo": "npm run build:demo && wrangler dev --config wrangler.demo.jsonc",
+    "deploy:demo": "npm run build:demo && wrangler deploy --config wrangler.demo.jsonc"
   },
   "devDependencies": {
     "@radix-ui/react-tooltip": "^1.2.8",

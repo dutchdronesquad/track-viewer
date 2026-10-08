@@ -19,10 +19,10 @@ export const choices = {
   backs: ["default", "orange", "blue"],
   labels: ["default", "custom"],
 } as const;
-export type LabState = {
+export type ScenarioState = {
   [K in keyof typeof choices]: (typeof choices)[K][number];
 };
-export const defaults: LabState = {
+export const defaults: ScenarioState = {
   scenario: "circuit",
   view: "3d",
   presentation: "framed",
@@ -42,7 +42,7 @@ export const defaults: LabState = {
   backs: "default",
   labels: "default",
 };
-export function readState(search: string): LabState {
+export function readState(search: string): ScenarioState {
   const params = new URLSearchParams(search);
   return Object.fromEntries(
     Object.entries(choices).map(([key, values]) => {
@@ -51,15 +51,15 @@ export function readState(search: string): LabState {
         key,
         value && (values as readonly string[]).includes(value)
           ? value
-          : defaults[key as keyof LabState],
+          : defaults[key as keyof ScenarioState],
       ];
     })
-  ) as LabState;
+  ) as ScenarioState;
 }
-export function stateQuery(state: LabState): string {
+export function stateQuery(state: ScenarioState): string {
   return new URLSearchParams(
     Object.entries(state).filter(
-      ([key, value]) => value !== defaults[key as keyof LabState]
+      ([key, value]) => value !== defaults[key as keyof ScenarioState]
     )
   ).toString();
 }

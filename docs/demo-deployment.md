@@ -6,9 +6,9 @@ Public demo: [TrackDraw Viewer demo](https://viewer.trackdraw.app/).
 
 ## Build and preview
 
-Run `npm ci`, then `npm run build:lab`. Production output lives in `lab/dist`, is minified and excludes source maps, development reload code and npm package contents. It is rebuilt from scratch to avoid deploying stale chunks. The demo remains outside the published packages.
+Run `npm ci`, then `npm run build:demo`. Production output lives in `demo/dist`, is minified and excludes source maps, development reload code and npm package contents. It is rebuilt from scratch to avoid deploying stale chunks. The demo remains outside the published packages.
 
-Run `npm run preview:demo` to build and serve through Wrangler's local Static Assets runtime. Check `/`, `/?mode=develop&recipe=controls`, `/?mode=develop&recipe=fallback` and `/?mode=lab`. Query parameters select examples; no server-side application or SPA path fallback is needed. Unknown asset paths return 404. Stable entry files revalidate through the deployed `_headers` file.
+Run `npm run preview:demo` to build and serve through Wrangler's local Static Assets runtime. Check `/`, `/?mode=develop&recipe=controls`, `/?mode=develop&recipe=fallback` and `/?mode=scenarios`. Query parameters select examples; no server-side application or SPA path fallback is needed. Unknown asset paths return 404. Stable entry files revalidate through the deployed `_headers` file.
 
 ## Publish
 
@@ -20,9 +20,9 @@ After publishing, verify the demo identity, qualifying/final switching, 2D/3D co
 
 ## GitHub deployment
 
-`.github/workflows/demo.yml` deploys through the GitHub environment `cf-demo` and can run manually with `workflow_dispatch`. Configure environment variable `CLOUDFLARE_ACCOUNT_ID` and environment secret `CLOUDFLARE_API_TOKEN` for the intended account, using a scoped Workers deployment token. Never copy a local OAuth credential into CI. Environment protection rules can gate publishing independently of package releases.
+`.github/workflows/demo.yml` deploys through the GitHub environment `cf-demo` and can run manually with `workflow_dispatch`. Configure environment variable `CLOUDFLARE_ACCOUNT_ID` and environment secret `CLOUDFLARE_API_TOKEN` for the intended account, using the [Edit Cloudflare Workers API token template](https://developers.cloudflare.com/workers/ci-cd/external-cicd/github-actions/) scoped to the intended account and the `trackdraw.app` zone. Never copy a local OAuth credential into CI. Environment protection rules can gate publishing independently of package releases.
 
-Set repository variable `DEMO_DEPLOY_ENABLED` to `true` to publish automatically on pushes to `main`. The flag is off by default so an unconfigured checkout does not attempt deployment. Deployments run typecheck, lint and tests before building; concurrent publishes are serialized. Pull requests validate the minified site and Wrangler dry-run but do not publish.
+Pushes to `main` publish automatically through `cf-demo`. Configure its deployment credentials before merging the demo workflow. Deployments run typecheck, lint and tests before building; concurrent publishes are serialized. Pull requests validate the minified site and Wrangler dry-run but do not publish.
 
 The GitHub environment is a deployment/credential boundary. The Cloudflare target remains the dedicated `track-viewer-demo` Worker in `wrangler.demo.jsonc`; no additional Wrangler environment is required for this single demo target. `viewer.trackdraw.app` is the connected custom hostname and the public demo address.
 
