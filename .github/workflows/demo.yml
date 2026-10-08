@@ -18,7 +18,7 @@ jobs:
     name: Deploy demo
     environment:
       name: cf-demo
-      url: https://track-viewer-demo.sweet-mountain-8a35.workers.dev/
+      url: https://viewer.trackdraw.app/
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:

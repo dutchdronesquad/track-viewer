@@ -150,7 +150,7 @@ Report bugs or request features in [GitHub Issues](https://github.com/dutchdrone
 
 ### Demo and development examples
 
-Try the [live viewer demo](https://track-viewer-demo.sweet-mountain-8a35.workers.dev/) to explore what the package can do on a website. Events and layouts are illustrative samples.
+Try the [live viewer demo](https://viewer.trackdraw.app/) to explore what the package can do on a website. Events and layouts are illustrative samples.
 
 Explore the viewer locally with `npm run dev:lab`: a website showcase featuring the viewer as a hero, an event page with switchable race tracks and interactive obstacle previews. Open `/?mode=develop` for six live integration recipes, copyable HTML/JavaScript and downloadable sample tracks. Separate scenario tools at `/?mode=lab` provide deterministic scenes, live settings, viewer comparisons and local snapshot/archive imports. See [Visual lab development](CONTRIBUTING.md#visual-lab) for setup and visual checks. The lab is separate from the published packages.
 

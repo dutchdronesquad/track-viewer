@@ -2,7 +2,7 @@
 
 The demo is a static showcase of the `@trackdraw/viewer` package. It includes a transparent hero, a fictional event with switchable qualifying/final layouts, a track briefing, obstacle previews, developer recipes and separate scenario tools. Labels identify the site as a demo and its tracks/events as samples. Examples follow this repository's source, including options that may not yet be released on npm.
 
-Public demo: [TrackDraw Viewer demo](https://track-viewer-demo.sweet-mountain-8a35.workers.dev/).
+Public demo: [TrackDraw Viewer demo](https://viewer.trackdraw.app/).
 
 ## Build and preview
 
@@ -14,7 +14,7 @@ Run `npm run preview:demo` to build and serve through Wrangler's local Static As
 
 The dedicated Worker is `track-viewer-demo`, configured in `wrangler.demo.jsonc`. It has only static assets: no database, storage binding, API credentials in the browser or server-side code. Catalog artwork is requested from the public asset service. Imported tracks remain local to the user's browser.
 
-Authenticate Wrangler with the intended Cloudflare account and run `npm run deploy:demo`. With multiple accounts, explicitly set `CLOUDFLARE_ACCOUNT_ID`. Wrangler reports the exact public `workers.dev` URL; verify that URL after deployment. A custom domain can be added separately when its hostname is chosen.
+Authenticate Wrangler with the intended Cloudflare account and run `npm run deploy:demo`. With multiple accounts, explicitly set `CLOUDFLARE_ACCOUNT_ID`. The demo is served at `https://viewer.trackdraw.app/`, configured as a Worker Custom Domain in `wrangler.demo.jsonc`. Verify that hostname after deployment; the automatically assigned `workers.dev` URL is not the primary demo address.
 
 After publishing, verify the demo identity, qualifying/final switching, 2D/3D controls, developer snippets, sample downloads, catalog textures, fallback, narrow layout and response headers. Check real touch-device interaction separately before declaring touch acceptance.
 
@@ -24,7 +24,7 @@ After publishing, verify the demo identity, qualifying/final switching, 2D/3D co
 
 Set repository variable `DEMO_DEPLOY_ENABLED` to `true` to publish automatically on pushes to `main`. The flag is off by default so an unconfigured checkout does not attempt deployment. Deployments run typecheck, lint and tests before building; concurrent publishes are serialized. Pull requests validate the minified site and Wrangler dry-run but do not publish.
 
-The GitHub environment is a deployment/credential boundary. The Cloudflare target remains the dedicated `track-viewer-demo` Worker in `wrangler.demo.jsonc`; no additional Wrangler environment is required for this single demo target. `viewer.trackdraw.app` is the proposed custom hostname and is not configured until confirmed.
+The GitHub environment is a deployment/credential boundary. The Cloudflare target remains the dedicated `track-viewer-demo` Worker in `wrangler.demo.jsonc`; no additional Wrangler environment is required for this single demo target. `viewer.trackdraw.app` is the connected custom hostname and the public demo address.
 
 The demo is independently deployable from a reviewed branch. Merging the demo PR and publishing an npm release are separate actions. If this PR is stacked on the transparent-presentation PR, merge that dependency first and retarget the demo PR to `main`.
 
