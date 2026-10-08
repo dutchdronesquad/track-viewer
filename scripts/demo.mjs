@@ -11,6 +11,11 @@ await copyFile(
   path.join(root, "demo/index.html"),
   path.join(output, "index.html")
 );
+for (const page of ["develop", "scenarios"])
+  await copyFile(
+    path.join(root, "demo/index.html"),
+    path.join(output, `${page}.html`)
+  );
 if (building)
   await copyFile(
     path.join(root, "demo/_headers"),
@@ -70,7 +75,11 @@ const server = createServer(async (req, res) => {
     return;
   }
   try {
-    const pathname = decodeURIComponent(url.pathname);
+    let pathname = decodeURIComponent(url.pathname);
+    if (
+      ["/develop", "/develop/", "/scenarios", "/scenarios/"].includes(pathname)
+    )
+      pathname = pathname.replace(/\/$/, "") + ".html";
     const file = path.resolve(
       output,
       `.${pathname === "/" ? "/index.html" : pathname}`

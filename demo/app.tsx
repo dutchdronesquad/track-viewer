@@ -42,7 +42,7 @@ function App() {
     history.replaceState(
       null,
       "",
-      `${location.pathname}?mode=scenarios&${stateQuery(state)}`
+      `/scenarios${stateQuery(state) ? `?${stateQuery(state)}` : ""}`
     );
   }, [state]);
   // Preview children tear down their React roots before archive object URLs are revoked.
@@ -185,9 +185,8 @@ function App() {
       return;
     }
     const url = new URL(location.href);
-    url.search =
-      "mode=scenarios&" +
-      stateQuery({ ...state, clean: clean ? "on" : state.clean });
+    url.pathname = "/scenarios";
+    url.search = stateQuery({ ...state, clean: clean ? "on" : state.clean });
     try {
       await navigator.clipboard.writeText(url.href);
       setNotice("Preview URL copied.");
@@ -454,12 +453,11 @@ function App() {
     </div>
   );
 }
+const page = location.pathname.replace(/\/$/, "");
 createRoot(document.getElementById("root")!).render(
-  ["scenarios", "lab"].includes(
-    new URLSearchParams(location.search).get("mode") ?? ""
-  ) ? (
+  page === "/scenarios" ? (
     <App />
-  ) : new URLSearchParams(location.search).get("mode") === "develop" ? (
+  ) : page === "/develop" ? (
     <Develop />
   ) : (
     <Showcase />

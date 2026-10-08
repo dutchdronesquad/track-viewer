@@ -8,7 +8,7 @@ Public demo: [TrackDraw Viewer demo](https://viewer.trackdraw.app/).
 
 Run `npm ci`, then `npm run build:demo`. Production output lives in `demo/dist`, is minified and excludes source maps, development reload code and npm package contents. It is rebuilt from scratch to avoid deploying stale chunks. The demo remains outside the published packages.
 
-Run `npm run preview:demo` to build and serve through Wrangler's local Static Assets runtime. Check `/`, `/?mode=develop&recipe=controls`, `/?mode=develop&recipe=fallback` and `/?mode=scenarios`. Query parameters select examples; no server-side application or SPA path fallback is needed. Unknown asset paths return 404. Stable entry files revalidate through the deployed `_headers` file.
+Run `npm run preview:demo` to build and serve through Wrangler's local Static Assets runtime. Check `/`, `/develop?recipe=controls`, `/develop?recipe=fallback` and `/scenarios`. The static build emits explicit HTML entry points for `/`, `/develop` and `/scenarios`; query parameters select recipes and scenario settings. No server-side application or SPA path fallback is needed. Unknown asset paths return 404. Stable entry files revalidate through the deployed `_headers` file.
 
 ## Publish
 

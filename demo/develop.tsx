@@ -60,7 +60,7 @@ export function Develop() {
         </a>
         <nav aria-label="Developer navigation">
           <a href="/">Showcase</a>
-          <a href="/?mode=scenarios">Scenario tools ↗</a>
+          <a href="/scenarios">Scenario tools ↗</a>
         </nav>
       </header>
       <main className="developer-main">
@@ -99,7 +99,7 @@ export function Develop() {
                   history.replaceState(
                     null,
                     "",
-                    `/?mode=develop&recipe=${recipe.id}`
+                    `/develop?recipe=${recipe.id}`
                   );
                 }}
               >
@@ -293,8 +293,8 @@ try {
               <h3>Bring your own track</h3>
               <p>
                 Export a viewer snapshot or .tdviewer.zip from TrackDraw. Use
-                the <a href="/?mode=scenarios">scenario tools</a> to check it
-                locally before integrating. Keep API credentials on your server.
+                the <a href="/scenarios">scenario tools</a> to check it locally
+                before integrating. Keep API credentials on your server.
               </p>
               <details>
                 <summary>Load an offline archive</summary>
