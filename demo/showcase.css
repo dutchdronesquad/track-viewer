@@ -829,3 +829,56 @@
     font-size: 11px;
   }
 }
+
+@media (max-width: 640px) {
+  .showcase-nav nav {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    gap: 0 18px;
+    font-size: 13px;
+  }
+  .showcase-nav nav a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+  .showcase-hero h1 {
+    font-size: clamp(46px, 16vw, 68px);
+    letter-spacing: -2.5px;
+  }
+  .hero-scene-caption {
+    flex-wrap: wrap;
+    gap: 8px;
+    font-size: 10px;
+  }
+  .hero-scene-caption button,
+  .track-actions button,
+  .briefing-controls button,
+  .event-track-picker button {
+    min-width: 44px;
+    min-height: 44px;
+  }
+  .track-embed-header,
+  .briefing-controls,
+  .event-track-picker {
+    flex-wrap: wrap;
+  }
+  .event-track-picker button {
+    flex: 1;
+    justify-content: center;
+    gap: 8px;
+  }
+  .briefing-controls button {
+    font-size: 12px;
+  }
+  .gate-personalisation button {
+    width: 44px;
+    height: 44px;
+    border-width: 10px;
+  }
+  .integration-link,
+  .showcase-footer a {
+    min-height: 44px;
+    align-content: center;
+  }
+}

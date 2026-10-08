@@ -483,3 +483,28 @@ pre {
     gap: 10px;
   }
 }
+
+@media (max-width: 700px) {
+  .header-actions,
+  .scene-heading,
+  .view-switch {
+    flex-wrap: wrap;
+  }
+  .header-actions button,
+  .header-actions .button,
+  .scene,
+  .view-switch button,
+  .stage-footer button,
+  .setting select,
+  .settings button {
+    min-height: 44px;
+  }
+  .viewport-phone .preview-frame,
+  .viewport-tablet .preview-frame,
+  .viewport-desktop .preview-frame {
+    max-width: 100%;
+  }
+  .exit-clean {
+    opacity: 1;
+  }
+}

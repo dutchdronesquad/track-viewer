@@ -306,3 +306,35 @@
   text-decoration: underline;
   white-space: nowrap;
 }
+
+@media (max-width: 500px) {
+  .developer-nav nav {
+    flex-wrap: wrap;
+    gap: 0 20px;
+  }
+  .developer-nav nav a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+  .recipe-preview-bar,
+  .recipe-track-picker {
+    flex-wrap: wrap;
+    gap: 8px;
+    padding-inline: 12px;
+  }
+  .recipe-preview-bar > div {
+    flex-wrap: wrap;
+  }
+  .developer button,
+  .recipe-next summary {
+    min-height: 44px;
+  }
+  .recipe-heading,
+  .code-heading {
+    min-width: 0;
+  }
+  .development-build-note a {
+    white-space: normal;
+  }
+}
