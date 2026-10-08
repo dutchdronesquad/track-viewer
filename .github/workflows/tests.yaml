@@ -42,5 +42,9 @@ jobs:
         run: npm ci
       - name: 🚀 Run package build
         run: npm run build
+      - name: Build demo site
+        run: node scripts/lab.mjs --build
+      - name: Verify demo deployment bundle
+        run: npx wrangler deploy --config wrangler.demo.jsonc --dry-run
       - name: Verify standalone package
         run: npm run test:package

@@ -1,0 +1,33 @@
+# Viewer demo deployment
+
+The demo is a static showcase of the `@trackdraw/viewer` package. It includes a transparent hero, a fictional event with switchable qualifying/final layouts, a track briefing, obstacle previews, developer recipes and separate scenario tools. Labels identify the site as a demo and its tracks/events as samples. Examples follow this repository's source, including options that may not yet be released on npm.
+
+Public demo: [TrackDraw Viewer demo](https://track-viewer-demo.sweet-mountain-8a35.workers.dev/).
+
+## Build and preview
+
+Run `npm ci`, then `npm run build:lab`. Production output lives in `lab/dist`, is minified and excludes source maps, development reload code and npm package contents. It is rebuilt from scratch to avoid deploying stale chunks. The demo remains outside the published packages.
+
+Run `npm run preview:demo` to build and serve through Wrangler's local Static Assets runtime. Check `/`, `/?mode=develop&recipe=controls`, `/?mode=develop&recipe=fallback` and `/?mode=lab`. Query parameters select examples; no server-side application or SPA path fallback is needed. Unknown asset paths return 404. Stable entry files revalidate through the deployed `_headers` file.
+
+## Publish
+
+The dedicated Worker is `track-viewer-demo`, configured in `wrangler.demo.jsonc`. It has only static assets: no database, storage binding, API credentials in the browser or server-side code. Catalog artwork is requested from the public asset service. Imported tracks remain local to the user's browser.
+
+Authenticate Wrangler with the intended Cloudflare account and run `npm run deploy:demo`. With multiple accounts, explicitly set `CLOUDFLARE_ACCOUNT_ID`. Wrangler reports the exact public `workers.dev` URL; verify that URL after deployment. A custom domain can be added separately when its hostname is chosen.
+
+After publishing, verify the demo identity, qualifying/final switching, 2D/3D controls, developer snippets, sample downloads, catalog textures, fallback, narrow layout and response headers. Check real touch-device interaction separately before declaring touch acceptance.
+
+## GitHub deployment
+
+`.github/workflows/demo.yml` can deploy manually with `workflow_dispatch`. Configure repository variable `CLOUDFLARE_ACCOUNT_ID` and secret `CLOUDFLARE_API_TOKEN` for the intended account, using a scoped Workers deployment token. Never copy a local OAuth credential into CI.
+
+Set repository variable `DEMO_DEPLOY_ENABLED` to `true` to publish automatically on pushes to `main`. The flag is off by default so an unconfigured checkout does not attempt deployment. Deployments run typecheck, lint and tests before building; concurrent publishes are serialized. Pull requests validate the minified site and Wrangler dry-run but do not publish.
+
+The demo is independently deployable from a reviewed branch. Merging the demo PR and publishing an npm release are separate actions. If this PR is stacked on the transparent-presentation PR, merge that dependency first and retarget the demo PR to `main`.
+
+## Hosting reference
+
+- [Workers Static Assets](https://developers.cloudflare.com/workers/static-assets/)
+- [Wrangler asset configuration](https://developers.cloudflare.com/workers/wrangler/configuration/#assets)
+- [GitHub Actions deployment](https://developers.cloudflare.com/workers/ci-cd/external-cicd/github-actions/)

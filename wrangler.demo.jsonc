@@ -1,0 +1,11 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "track-viewer-demo",
+  "compatibility_date": "2026-10-08",
+  "workers_dev": true,
+  "preview_urls": true,
+  "assets": {
+    "directory": "./lab/dist",
+    "not_found_handling": "none",
+  },
+}
