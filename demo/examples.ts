@@ -122,7 +122,7 @@ export const recipes: Recipe[] = [
     title: "Your own controls",
     use: "Switchable race layouts",
     explanation:
-      "Control the view from your own buttons. update() changes options on the existing viewer; use it to switch the track without creating another mount.",
+      "Control the view from your own buttons with partial update() calls. Use setSource() to load another track; the package validates it and preserves your display options.",
     design: flow,
     options: {
       presentation: "transparent",
@@ -183,28 +183,23 @@ export function recipeCode(
 ): string {
   const { forceWebglUnsupported: _forced, ...publicOptions } = options;
   const controlled = recipe.id === "controls";
-  return `import {
-  createTrackDrawViewer,
-  validateViewerDesignSnapshot,
-  assertViewerSnapshotSupported,
-} from "@trackdraw/viewer";
+  return `import { mountTrack } from "@trackdraw/viewer";
 import "@trackdraw/viewer/static/trackdraw-viewer.css";
 
-// Host the downloaded sample at this URL, or use your own snapshot.
-const response = await fetch(${JSON.stringify(`./${snapshotFile ?? (controlled ? "qualifying.snapshot.json" : "track.snapshot.json")}`)});
-if (!response.ok) throw new Error("Could not load the track");
-const snapshot = validateViewerDesignSnapshot(await response.json());
-assertViewerSnapshotSupported(snapshot);
-
-const viewer = createTrackDrawViewer(document.querySelector("#track"), {
-  design: snapshot.design,
-${JSON.stringify(publicOptions, null, 2).slice(2, -2)},
+// Host the downloaded sample at this URL, or use your own snapshot/archive.
+const viewer = await mountTrack("#track", {
+  source: ${JSON.stringify(`./${snapshotFile ?? (controlled ? "qualifying.snapshot.json" : "track.snapshot.json")}`)},
+${JSON.stringify(publicOptions, null, 2).slice(2, -2)}${
+    recipe.id === "fallback"
+      ? `,
   onViewStateChange: ({ view, available3D }) => {
     document.querySelector("#status").textContent =
       available3D ? "Viewing in " + view.toUpperCase() : "Viewing in 2D: 3D is unavailable";
-  },
+  }`
+      : ""
+  }
 });
-${recipe.id === "hero" ? '\ndocument.querySelector("#reset").addEventListener("click", () => viewer.resetOverview());\n' : ""}${controlled ? '\nfor (const button of document.querySelectorAll("[data-view]")) {\n  button.addEventListener("click", () => viewer.update({ view: button.dataset.view }));\n}\n\nlet request = 0;\nfor (const button of document.querySelectorAll("[data-track]")) {\n  button.addEventListener("click", async () => {\n    const revision = ++request;\n    try {\n      const response = await fetch(button.dataset.track);\n      if (!response.ok) throw new Error("Could not load the track");\n      const next = validateViewerDesignSnapshot(await response.json());\n      assertViewerSnapshotSupported(next);\n      if (revision === request) viewer.update({ design: next.design });\n    } catch {\n      if (revision === request) document.querySelector("#status").textContent = "Could not load the selected track";\n    }\n  });\n}\n' : ""}${recipe.id === "fallback" ? "\n// WebGL fallback is automatic. For development testing only:\n// viewer.update({ forceWebglUnsupported: true });\n" : ""}
+${recipe.id === "hero" ? '\ndocument.querySelector("#reset").addEventListener("click", () => viewer.resetOverview());\n' : ""}${controlled ? '\nfor (const button of document.querySelectorAll("[data-view]")) {\n  button.addEventListener("click", () => viewer.update({ view: button.dataset.view }));\n}\n\nfor (const button of document.querySelectorAll("[data-track]")) {\n  button.addEventListener("click", async () => {\n    try {\n      await viewer.setSource(button.dataset.track);\n    } catch {\n      document.querySelector("#status").textContent = "Could not load the selected track";\n    }\n  });\n}\n' : ""}${recipe.id === "fallback" ? "\n// WebGL fallback is automatic. For development testing only:\n// viewer.update({ forceWebglUnsupported: true });\n" : ""}
 // Call when the host removes this embed, e.g. during route cleanup.
 // viewer.destroy();`;
 }

@@ -148,7 +148,7 @@ test("packed package installs and typechecks in a host without React", () => {
     writeFileSync(
       path.join(dir, "consumer.ts"),
       `
-      import { createTrackDrawViewer, type TrackDrawViewerOptions, type ViewerDesign } from "@trackdraw/viewer";
+      import { mountTrack, createTrackDrawViewer, type TrackDrawViewerOptions, type ViewerDesign } from "@trackdraw/viewer";
       import { createTrackDrawViewer as mount } from "@trackdraw/viewer/mount";
       import { validateViewerDesignSnapshot } from "@trackdraw/viewer/snapshot/schema";
       import { readViewerArchive } from "@trackdraw/viewer/snapshot/archive";
@@ -158,6 +158,10 @@ test("packed package installs and typechecks in a host without React", () => {
       const mountOptions: Parameters<typeof mount>[1] = options;
       viewer.update(mountOptions);
       viewer.destroy();
+      const simple = await mountTrack("#track", { source: "/track.json", initialView: "3d" });
+      simple.update({ theme: "dark" });
+      await simple.setSource(new File([], "track.tdviewer.zip"));
+      simple.destroy();
       void mount; void validateViewerDesignSnapshot; void readViewerArchive;
     `
     );
@@ -330,6 +334,7 @@ test("the self-contained static viewer reads legacy offline assets", () => {
   const bytes = new Uint8Array(
     readFileSync(path.join(root, "tests/fixtures/viewer-1.0.1.tdviewer.zip"))
   );
+  assert.equal(typeof context.TrackDrawViewer.mountTrack, "function");
   const archive = context.TrackDrawViewer.readViewerArchive(bytes);
   const snapshot = JSON.parse(
     readFileSync(path.join(root, "tests/fixtures/viewer-1.0.1.json"), "utf8")

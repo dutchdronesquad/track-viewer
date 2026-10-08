@@ -34,24 +34,21 @@ For a site without a bundler, use the [plain HTML integration](#plain-html).
 
 ## Quick start
 
-The default API bundles its own rendering runtime. Your application does not need React:
+The default API bundles its own rendering runtime. Your application does not need React. `mountTrack` loads and validates snapshot JSON or an offline archive, checks renderer compatibility and manages archive textures. Catch loading errors in your page; use an `AbortSignal` when your component can unmount during loading. See the [integration guide](https://github.com/dutchdronesquad/track-viewer/blob/main/docs/integration.md#simple-website-embed) for cleanup and error handling. This API follows the development source and will be available in the next package release.
 
 ```ts
-import { createTrackDrawViewer } from "@trackdraw/viewer";
+import { mountTrack } from "@trackdraw/viewer";
 import "@trackdraw/viewer/static/trackdraw-viewer.css";
 
-// container is an HTMLElement with an explicit width and height.
-// snapshot is a validated, compatible viewer snapshot.
-const viewer = createTrackDrawViewer(container, {
-  design: snapshot.design,
-  theme: "light",
+// #track is an existing element, e.g. <div id="track" style="height: 420px"></div>.
+const viewer = await mountTrack("#track", {
+  source: "/track.snapshot.json", // A public snapshot URL, .tdviewer.zip URL or File.
+  initialView: "3d",
 });
 
-// Supply the complete options when updating the viewer.
-viewer.update({ design: nextSnapshot.design, theme: "light" });
-
-// Release resources when removing the preview.
-viewer.destroy();
+viewer.update({ theme: "dark" }); // Other options and the track are preserved.
+await viewer.setSource("/final.snapshot.json"); // Validated before replacing the track.
+viewer.destroy(); // Unmount and release archive textures when removing the embed.
 ```
 
 ## Plain HTML

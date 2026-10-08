@@ -1,5 +1,49 @@
 # Integration guide
 
+## Simple website embed
+
+Use `mountTrack` from `@trackdraw/viewer` to load a public snapshot or archive and show it in an existing element. It includes snapshot validation, renderer compatibility checks and archive texture cleanup. This API follows development source and will be available in the next npm release; use `createTrackDrawViewer` with current releases until then.
+
+```ts
+import { mountTrack } from "@trackdraw/viewer";
+import "@trackdraw/viewer/static/trackdraw-viewer.css";
+
+const viewer = await mountTrack("#track", {
+  source: "/track.snapshot.json",
+  initialView: "3d",
+});
+viewer.update({ theme: "dark" });
+await viewer.setSource("/final.snapshot.json");
+// On removing the embed:
+viewer.destroy();
+```
+
+Give the element an explicit height, for example `<div id="track" style="height: 420px; width: 100%"></div>`. `source` accepts a JSON snapshot URL, a `.tdviewer.zip` URL, a `URL`, a local `File`/`Blob`, or a snapshot object. URL archives should use a `.zip` extension or a ZIP response content type. Public URLs need to permit browser CORS access; keep private API credentials on your server. For TrackDraw REST responses, adapt `response.data` with `viewerSnapshotFromApi` before passing that snapshot as `source`.
+
+`update()` merges display options, preserving unspecified options, callbacks and the track. Pass `undefined` to clear an optional option. `setSource()` validates before replacing the current viewer, preserves display options and resets the camera for the new track. A failed load rejects and leaves the current track visible. Rapid switches use the latest request; superseded requests and loads cancelled by `destroy()` resolve to `false`, successful replacements resolve to `true`. `destroy()` is idempotent and releases archive object URLs after unmounting. No extra `assets.dispose()` is needed.
+
+Loading errors are rejected promises, so show feedback in your host page. During a component lifecycle, cancel the initial load if the container is removed before the handle arrives:
+
+```ts
+const controller = new AbortController();
+let viewer: Awaited<ReturnType<typeof mountTrack>> | undefined;
+// Register this with your framework's cleanup hook before starting the load.
+const cleanup = () => {
+  controller.abort();
+  viewer?.destroy();
+};
+try {
+  viewer = await mountTrack(container, {
+    source: "/track.tdviewer.zip",
+    signal: controller.signal,
+  });
+} catch (error) {
+  if (!controller.signal.aborted) showTrackError(error);
+}
+```
+
+The signal applies to initial loading. Later `setSource()` loads are managed by the handle and cancelled by subsequent source changes or destruction. Use the low-level mount interface below for already prepared designs and custom asset resolvers.
+
 ## Mount API
 
 Import `createTrackDrawViewer` from `@trackdraw/viewer` or `@trackdraw/viewer/mount`. Give it an empty, host-owned `HTMLElement` with an explicit width and height, plus `TrackDrawViewerOptions`. Keep the returned handle for updates and cleanup:
