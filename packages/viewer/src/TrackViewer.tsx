@@ -7,15 +7,19 @@ import { Viewer3DBoundary } from "./capabilities/Viewer3DBoundary";
 import { TooltipProvider } from "./components/AppTooltip";
 import { ViewerContainerContext } from "./components/viewer-container";
 import TrackViewer2D from "./viewer-2d/TrackViewer2D";
+import { DEFAULT_VIEWER_LABELS } from "./i18n/labels";
 import type { TrackDrawViewerOptions } from "./viewer-options";
 
 const TrackViewer3D = lazy(() => import("./viewer-3d/TrackViewer3D"));
 
 export function TrackViewer({
   design,
-  initialView = "2d",
+  presentation = "framed",
+  initialView = presentation === "transparent" ? "3d" : "2d",
+  resetRevision = 0,
+  showResetControl = presentation === "transparent",
   view: controlledView,
-  showViewControls = true,
+  showViewControls = presentation !== "transparent",
   onViewStateChange,
   onViewChange,
   assetsBaseUrl,
@@ -28,7 +32,9 @@ export function TrackViewer({
   labels,
   showObstacleNumbers,
   forceWebglUnsupported = false,
-}: TrackDrawViewerOptions) {
+}: TrackDrawViewerOptions & { resetRevision?: number }) {
+  const transparent = presentation === "transparent";
+  const [localReset, setLocalReset] = useState(0);
   const webglSupported = useWebglSupport(forceWebglUnsupported) === "supported";
   const [failed3D, setFailed3D] = useState(false);
   const [internalView, setView] = useState(initialView);
@@ -50,7 +56,9 @@ export function TrackViewer({
       ref={setContainer}
       className="trackdraw-viewer"
       data-theme={theme}
+      data-presentation={presentation}
       style={{
+        background: transparent ? "transparent" : undefined,
         position: "relative",
         height: "100%",
         width: "100%",
@@ -108,14 +116,23 @@ export function TrackViewer({
                   className="absolute inset-0"
                 >
                   <Viewer3DBoundary onUnavailable={handle3DFailure}>
-                    <Suspense fallback={null}>
+                    <Suspense
+                      fallback={
+                        <div role="status">
+                          {labels?.loading3D ??
+                            DEFAULT_VIEWER_LABELS.canvasOverlay.loading3D}
+                        </div>
+                      }
+                    >
                       <TrackViewer3D
+                        presentation={transparent}
+                        resetRevision={`${resetRevision}:${localReset}`}
                         design={design}
                         theme={theme}
                         assetsBaseUrl={assetsBaseUrl}
                         assetResolver={assetResolver}
                         camera={camera3D}
-                        showGizmo={show3DAxes}
+                        showGizmo={show3DAxes ?? !transparent}
                         gateBackColors={gateBackColors}
                         active={active3D}
                         onUnavailable={handle3DFailure}
@@ -123,6 +140,25 @@ export function TrackViewer({
                     </Suspense>
                   </Viewer3DBoundary>
                 </div>
+              ) : null}
+              {transparent && view === "3d" && !available3D ? (
+                <div
+                  role="status"
+                  className="bg-card absolute top-2 left-2 z-30 p-2 text-sm"
+                >
+                  {labels?.unavailable3D ??
+                    DEFAULT_VIEWER_LABELS.canvasOverlay.unavailable3D}
+                </div>
+              ) : null}
+              {showResetControl && active3D ? (
+                <button
+                  type="button"
+                  onClick={() => setLocalReset((value) => value + 1)}
+                  className="border-border bg-card text-foreground focus-visible:outline-primary absolute right-2 bottom-2 min-h-11 rounded-md border px-3 py-2 focus-visible:outline-2"
+                >
+                  {labels?.resetOverview ??
+                    DEFAULT_VIEWER_LABELS.canvasOverlay.resetOverview}
+                </button>
               ) : null}
             </div>
           </TooltipProvider>

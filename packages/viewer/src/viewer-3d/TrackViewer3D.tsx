@@ -9,7 +9,7 @@
 "use client";
 
 import { OrbitControls } from "@react-three/drei";
-import { Canvas, useThree } from "@react-three/fiber";
+import { Canvas, useThree, useFrame } from "@react-three/fiber";
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 import {
   Suspense,
@@ -47,6 +47,10 @@ import {
 } from "./shared-scene";
 import { AxisGizmoOverlay, FieldWatermark } from "./overlays";
 
+import {
+  fitPresentationCamera,
+  getPresentationBounds,
+} from "./presentation-camera";
 import type { ViewerCamera3D } from "../viewer-options";
 
 export interface TrackViewer3DHandle {
@@ -55,6 +59,8 @@ export interface TrackViewer3DHandle {
 
 export interface TrackViewer3DProps {
   design: TrackDesign;
+  presentation?: boolean;
+  resetRevision?: string;
   theme?: "light" | "dark";
   showGizmo?: boolean;
   assetsBaseUrl?: string;
@@ -69,6 +75,8 @@ const TrackViewer3D = forwardRef<TrackViewer3DHandle, TrackViewer3DProps>(
   function TrackViewer3D(
     {
       design,
+      presentation = false,
+      resetRevision = "0",
       theme = "light",
       showGizmo = true,
       assetsBaseUrl,
@@ -84,6 +92,7 @@ const TrackViewer3D = forwardRef<TrackViewer3DHandle, TrackViewer3DProps>(
       () => resolveAsset ?? createAssetResolver(assetsBaseUrl),
       [assetsBaseUrl, resolveAsset]
     );
+    const sceneRef = useRef<THREE.Group>(null);
     const field = design.field;
     const shapes = useMemo(() => getViewerDesignShapes(design), [design]);
     const primaryPolylineId = useMemo(
@@ -142,7 +151,7 @@ const TrackViewer3D = forwardRef<TrackViewer3DHandle, TrackViewer3DProps>(
       <div
         className="relative h-full w-full"
         style={{
-          background: t.bg,
+          background: presentation ? "transparent" : t.bg,
           overscrollBehaviorX: "none",
           overscrollBehaviorY: "none",
           touchAction: "none",
@@ -157,12 +166,19 @@ const TrackViewer3D = forwardRef<TrackViewer3DHandle, TrackViewer3DProps>(
             near: 0.1,
             far: 500,
           }}
-          gl={{ antialias: true, preserveDrawingBuffer: true }}
+          gl={{ alpha: true, antialias: true, preserveDrawingBuffer: true }}
+          onCreated={({ gl }) => {
+            if (presentation) gl.setClearColor(0x000000, 0);
+          }}
         >
           <ContextLossGuard onUnavailable={onUnavailable} />
-          <color attach="background" args={[t.skyHorizon]} />
-          <fog attach="fog" args={[t.fog, 80, 260]} />
-          <GradientSky topColor={t.skyTop} horizonColor={t.skyHorizon} />
+          {!presentation && (
+            <>
+              <color attach="background" args={[t.skyHorizon]} />
+              <fog attach="fog" args={[t.fog, 80, 260]} />
+              <GradientSky topColor={t.skyTop} horizonColor={t.skyHorizon} />
+            </>
+          )}
           <hemisphereLight
             color={t.hemisphereSky}
             groundColor={t.hemisphereGround}
@@ -195,22 +211,33 @@ const TrackViewer3D = forwardRef<TrackViewer3DHandle, TrackViewer3DProps>(
             color="#60a5fa"
           />
 
-          <TrackSurface3D field={field} theme={t} />
+          <group ref={sceneRef}>
+            <TrackSurface3D field={field} theme={t} bounded={presentation} />
 
-          {shapeNodes}
+            {shapeNodes}
 
-          <FieldWatermark
-            fw={field.width}
-            fh={field.height}
-            isDark={theme === "dark"}
-          />
+            <FieldWatermark
+              fw={field.width}
+              fh={field.height}
+              isDark={theme === "dark"}
+            />
+          </group>
+          {presentation && (
+            <PresentationOverview
+              sceneRef={sceneRef}
+              controlsRef={orbitControlsRef}
+              revision={resetRevision}
+              design={design}
+            />
+          )}
 
           <ScreenshotHelper onReady={handleScreenshotReady} />
           <WheelBridge
+            key={resetRevision}
             controlsRef={orbitControlsRef}
             enabled={!isMobile}
-            minDistance={camera?.minDistance ?? 8}
-            maxDistance={Math.max(120, longest * 3)}
+            minDistance={camera?.minDistance ?? (presentation ? 0.1 : 8)}
+            maxDistance={Math.max(120, longest * (presentation ? 20 : 3))}
           />
           <OrbitGroundConstraint controlsRef={orbitControlsRef} />
           {showGizmo ? (
@@ -225,8 +252,8 @@ const TrackViewer3D = forwardRef<TrackViewer3DHandle, TrackViewer3DProps>(
               screenSpacePanning
               target={camera?.target ?? [cx, 0, cz]}
               maxPolarAngle={ORBIT_MAX_POLAR_ANGLE}
-              minDistance={camera?.minDistance ?? 8}
-              maxDistance={Math.max(120, longest * 3)}
+              minDistance={camera?.minDistance ?? (presentation ? 0.1 : 8)}
+              maxDistance={Math.max(120, longest * (presentation ? 20 : 3))}
               mouseButtons={{
                 LEFT: THREE.MOUSE.ROTATE,
                 MIDDLE: THREE.MOUSE.DOLLY,
@@ -247,8 +274,8 @@ const TrackViewer3D = forwardRef<TrackViewer3DHandle, TrackViewer3DProps>(
               screenSpacePanning
               target={camera?.target ?? [cx, 0, cz]}
               maxPolarAngle={ORBIT_MAX_POLAR_ANGLE}
-              minDistance={camera?.minDistance ?? 8}
-              maxDistance={Math.max(120, longest * 3)}
+              minDistance={camera?.minDistance ?? (presentation ? 0.1 : 8)}
+              maxDistance={Math.max(120, longest * (presentation ? 20 : 3))}
               mouseButtons={{
                 LEFT: THREE.MOUSE.ROTATE,
                 MIDDLE: THREE.MOUSE.PAN,
@@ -279,5 +306,54 @@ function ContextLossGuard({ onUnavailable }: { onUnavailable(): void }) {
     gl.domElement.addEventListener("webglcontextlost", lost);
     return () => gl.domElement.removeEventListener("webglcontextlost", lost);
   }, [gl, onUnavailable]);
+  return null;
+}
+
+/** Refit when geometry finishes loading, the host resizes, or reset is requested. */
+function PresentationOverview({
+  sceneRef,
+  controlsRef,
+  revision,
+  design,
+}: {
+  sceneRef: { current: THREE.Group | null };
+  controlsRef: { current: OrbitControlsImpl | null };
+  revision: string;
+  design: TrackDesign;
+}) {
+  const { camera, size } = useThree();
+  const lastBounds = useRef("");
+  const lastCheck = useRef(0);
+  useEffect(() => {
+    lastBounds.current = "";
+  }, [revision, design, size.width, size.height]);
+  useFrame((state) => {
+    if (
+      lastBounds.current &&
+      state.clock.elapsedTime - lastCheck.current < 0.25
+    )
+      return;
+    lastCheck.current = state.clock.elapsedTime;
+    if (
+      !sceneRef.current ||
+      !controlsRef.current ||
+      !(camera instanceof THREE.PerspectiveCamera)
+    )
+      return;
+    const bounds = getPresentationBounds(sceneRef.current);
+    if (bounds.isEmpty()) return;
+    const key = [...bounds.min.toArray(), ...bounds.max.toArray()].join(":");
+    if (key === lastBounds.current) return;
+    lastBounds.current = key;
+    const controls = controlsRef.current;
+    // Consume residual orbit deltas so reset is independent of prior gestures.
+    const damping = controls.enableDamping;
+    controls.enableDamping = false;
+    controls.reset();
+    controls.target.copy(fitPresentationCamera(camera, bounds));
+    controls.update();
+    controls.saveState();
+    controls.enableDamping = damping;
+  });
   return null;
 }

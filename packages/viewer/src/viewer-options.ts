@@ -18,6 +18,10 @@ export interface ViewerCamera3D {
 
 export interface TrackDrawViewerOptions {
   design: ViewerDesign;
+  /** Transparent bounded 3D scene; defaults to framed viewing. */
+  presentation?: "framed" | "transparent";
+  /** Minimal reset overlay; defaults to true in transparent presentation. */
+  showResetControl?: boolean;
   initialView?: ViewerView;
   /** Controlled mode for hosts that provide their own view buttons. */
   view?: ViewerView;
