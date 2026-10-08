@@ -13,6 +13,13 @@
 .developer-nav {
   background: #14242e;
   color: #f7f6f2;
+}
+.developer-nav-inner,
+.developer-main {
+  max-width: 1500px;
+  margin: auto;
+}
+.developer-nav-inner {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -24,8 +31,6 @@
   font-size: 13px;
 }
 .developer-main {
-  max-width: 1500px;
-  margin: auto;
   padding: 65px 5%;
 }
 .dev-eyebrow {
@@ -229,7 +234,7 @@
   }
 }
 @media (max-width: 500px) {
-  .developer-nav {
+  .developer-nav-inner {
     padding: 22px 6%;
     flex-wrap: wrap;
     gap: 22px;
