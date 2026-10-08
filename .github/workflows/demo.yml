@@ -16,6 +16,9 @@ jobs:
   deploy:
     if: github.event_name == 'workflow_dispatch' || vars.DEMO_DEPLOY_ENABLED == 'true'
     name: Deploy demo
+    environment:
+      name: cf-demo
+      url: https://track-viewer-demo.sweet-mountain-8a35.workers.dev/
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:

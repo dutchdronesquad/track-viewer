@@ -20,9 +20,11 @@ After publishing, verify the demo identity, qualifying/final switching, 2D/3D co
 
 ## GitHub deployment
 
-`.github/workflows/demo.yml` can deploy manually with `workflow_dispatch`. Configure repository variable `CLOUDFLARE_ACCOUNT_ID` and secret `CLOUDFLARE_API_TOKEN` for the intended account, using a scoped Workers deployment token. Never copy a local OAuth credential into CI.
+`.github/workflows/demo.yml` deploys through the GitHub environment `cf-demo` and can run manually with `workflow_dispatch`. Configure environment variable `CLOUDFLARE_ACCOUNT_ID` and environment secret `CLOUDFLARE_API_TOKEN` for the intended account, using a scoped Workers deployment token. Never copy a local OAuth credential into CI. Environment protection rules can gate publishing independently of package releases.
 
 Set repository variable `DEMO_DEPLOY_ENABLED` to `true` to publish automatically on pushes to `main`. The flag is off by default so an unconfigured checkout does not attempt deployment. Deployments run typecheck, lint and tests before building; concurrent publishes are serialized. Pull requests validate the minified site and Wrangler dry-run but do not publish.
+
+The GitHub environment is a deployment/credential boundary. The Cloudflare target remains the dedicated `track-viewer-demo` Worker in `wrangler.demo.jsonc`; no additional Wrangler environment is required for this single demo target. `viewer.trackdraw.app` is the proposed custom hostname and is not configured until confirmed.
 
 The demo is independently deployable from a reviewed branch. Merging the demo PR and publishing an npm release are separate actions. If this PR is stacked on the transparent-presentation PR, merge that dependency first and retarget the demo PR to `main`.
 
