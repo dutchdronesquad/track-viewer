@@ -133,6 +133,13 @@ export function Showcase() {
           <a href="#track">The track</a>
           <a href="#details">The details</a>
           <a href="/develop">Developers</a>
+          <a
+            href="https://github.com/dutchdronesquad/track-viewer"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            GitHub ↗
+          </a>
         </nav>
       </header>
       <main>

@@ -62,9 +62,15 @@ export function Develop() {
           <nav aria-label="Developer navigation">
             <a href="/">Showcase</a>
             <a href="/scenarios">Scenario tools ↗</a>
+            <a
+              href="https://github.com/dutchdronesquad/track-viewer"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              GitHub ↗
+            </a>
           </nav>
         </div>
-
       </header>
       <main className="developer-main">
         <div className="developer-intro">

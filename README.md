@@ -29,6 +29,8 @@
 <p align="center">
   <a href="https://www.npmjs.com/package/@trackdraw/viewer"><strong>npm package</strong></a>
   &middot;
+  <a href="https://viewer.trackdraw.app/"><strong>Live demo</strong></a>
+  &middot;
   <a href="#quick-start"><strong>Quick start</strong></a>
   &middot;
   <a href="https://github.com/dutchdronesquad/track-viewer/blob/main/docs/integration.md"><strong>Integration guide</strong></a>
