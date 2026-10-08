@@ -20,6 +20,6 @@
     },
     "types": ["node", "react", "react-dom"]
   },
-  "include": ["packages/*/src", "tests"],
+  "include": ["packages/*/src", "tests", "demo"],
   "exclude": ["node_modules", "dist"]
 }

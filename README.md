@@ -148,6 +148,12 @@ See [Contributing](https://github.com/dutchdronesquad/track-viewer/blob/main/CON
 
 Report bugs or request features in [GitHub Issues](https://github.com/dutchdronesquad/track-viewer/issues). For rendering problems, include the viewer version, browser, and a minimal track that reproduces the issue.
 
+### Demo and development examples
+
+Try the [live viewer demo](https://viewer.trackdraw.app/) to explore what the package can do on a website. Events and layouts are illustrative samples.
+
+Explore the viewer locally with `npm run dev:demo`: a website showcase featuring the viewer as a hero, an event page with switchable race tracks and interactive obstacle previews. Open `/?mode=develop` for six live integration recipes, copyable HTML/JavaScript and downloadable sample tracks. Separate scenario tools at `/?mode=scenarios` provide deterministic scenes, live settings, viewer comparisons and local snapshot/archive imports. See [Demo development](CONTRIBUTING.md#demo) for setup and visual checks. The demo is separate from the published packages.
+
 ## License
 
 [Apache-2.0](LICENSE). See [NOTICE.md](NOTICE.md) for attribution and third-party asset information.

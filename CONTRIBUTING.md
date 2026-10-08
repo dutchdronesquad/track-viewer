@@ -57,3 +57,25 @@ This package started life inside the trackdraw monorepo at `packages/viewer/` an
 ## Shared contract ownership
 
 See [Shared schema migration](docs/schema-migration.md) for ownership, compatibility and consumer release order. Schema must not import viewer/catalog geometry or rendering libraries. Run `npm run assets:catalog-manifest` when catalog texture references change; package tests inspect every emitted schema import and install schema alone without renderer dependencies or DOM initialization. Keep root and package manifests at `0.0.0` in Git.
+
+## Demo
+
+Run `npm run dev:demo` and open `http://localhost:5180`. Set `DEMO_PORT` to use another port. The demo bundles the current source through the public viewer mount API; source and demo CSS changes rebuild and reload the preview while preserving URL settings. If viewer stylesheet utilities change, restart `dev:demo` to regenerate the scoped package CSS.
+
+The default page is a website showcase: a transparent hero track, an event page with switchable qualifying/final tracks and a 2D/3D embed, a framed track briefing with measurement-unit and numbering controls, and an obstacle collection with interactive previews and gate-back colour choices. Offscreen examples unmount their viewers to release WebGL resources. Open `/?mode=scenarios` directly for the separate scenario workspace; the showcase links each integration to its code example. Open `/?mode=develop` for six live integration recipes, installation and container markup, copyable ESM code, downloadable validated sample snapshots, and offline archive loading. Recipe links retain their selection in the URL. The development page and scenario tools are separate from the showcase.
+
+Choose a scene from Tracks, Items or Edge cases. Finetune controls framed/transparent presentation, viewer theme independently of the host background, responsive container presets, units, obstacle numbering, viewer controls, camera presets, gate-back colours and custom overlay copy. Compare mounts a second independent viewer with the opposite theme and view. The URL records these settings; Copy clean preview URL hides the demo chrome for screenshots. Hover or focus the bottom-right Back to scenarios button to return.
+
+Import track accepts validated viewer snapshot JSON and `.tdviewer.zip` archives. Imports are local and never uploaded. Snapshot validation and renderer compatibility are checked separately. Archives use their embedded textures; choosing a built-in scene or replacing an import destroys the old viewers before releasing archive URLs. Local imports are not encoded in copied URLs or retained across source reloads. JSON catalog textures normally come from `assets.trackdraw.app`; the built-in generic track requires no catalog requests.
+
+Use Force WebGL unavailable to exercise the 2D fallback, and choose Obstacle catalog with Catalog textures set to missing to inspect failed texture loading. Runtime status reports each viewer's effective mode; container presets are bounded by available space, rather than simulating browser/device dimensions. Verify actual mobile breakpoints and touch interaction separately.
+
+Before changing the demo, run the normal checks and `npm run build:demo`. This creates an unhosted build under `demo/dist`; the demo is excluded from both published npm packages. The public demo uses Cloudflare Workers Static Assets; see [Demo deployment](docs/demo-deployment.md). The demo adds no account, API credential or analytics integration.
+
+Browser acceptance checks:
+
+- Switch scenes and views; orbit/zoom and reset the transparent overview on light, dark, gradient and checker backgrounds.
+- Resize the host, test phone/tablet containers, and compare independent viewers. Check the real page at a narrow browser viewport too.
+- Force WebGL fallback and inspect the effective mode and custom explanation. Restore defaults and confirm 3D returns.
+- Import valid JSON and an offline archive, reject malformed/incompatible files, then replace the import or select a fixture. Verify textures and viewer cleanup.
+- Reload a configured URL, inspect the clean preview, and use keyboard-only navigation in Finetune (Tab, Shift+Tab and Escape).
