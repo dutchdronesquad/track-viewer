@@ -67,24 +67,21 @@ For a site without a bundler, use the [plain HTML integration](#plain-html).
 
 ## Quick start
 
-The default API bundles its own rendering runtime. Your application does not need React:
+The default API bundles its own rendering runtime. Your application does not need React. `mountTrack` loads and validates snapshot JSON or an offline archive, checks renderer compatibility and manages archive textures. Catch loading errors in your page; use an `AbortSignal` when your component can unmount during loading. See the [integration guide](docs/integration.md#simple-website-embed) for cleanup and error handling. This API follows the development source and will be available in the next package release.
 
 ```ts
-import { createTrackDrawViewer } from "@trackdraw/viewer";
+import { mountTrack } from "@trackdraw/viewer";
 import "@trackdraw/viewer/static/trackdraw-viewer.css";
 
-// container is an HTMLElement with an explicit width and height.
-// snapshot is a validated, compatible viewer snapshot.
-const viewer = createTrackDrawViewer(container, {
-  design: snapshot.design,
-  theme: "light",
+// #track is an existing element, e.g. <div id="track" style="height: 420px"></div>.
+const viewer = await mountTrack("#track", {
+  source: "/track.snapshot.json", // A public snapshot URL, .tdviewer.zip URL or File.
+  initialView: "3d",
 });
 
-// Supply the complete options when updating the viewer.
-viewer.update({ design: nextSnapshot.design, theme: "light" });
-
-// Release resources when removing the preview.
-viewer.destroy();
+viewer.update({ theme: "dark" }); // Other options and the track are preserved.
+await viewer.setSource("/final.snapshot.json"); // Validated before replacing the track.
+viewer.destroy(); // Unmount and release archive textures when removing the embed.
 ```
 
 ## Plain HTML
@@ -96,12 +93,23 @@ Copy `dist/static/trackdraw-viewer.global.js` and `dist/static/trackdraw-viewer.
 <div id="track" style="height: 420px; width: 100%"></div>
 <script src="/vendor/trackdraw-viewer.global.js"></script>
 <script>
-  // Provide a validated, compatible viewer snapshot from your application.
-  const viewer = TrackDrawViewer.createTrackDrawViewer(
-    document.getElementById("track"),
-    { design: snapshot.design, theme: "light" }
-  );
-  window.addEventListener("pagehide", () => viewer.destroy());
+  const controller = new AbortController();
+  let viewer;
+  TrackDrawViewer.mountTrack("#track", {
+    source: "/track.snapshot.json",
+    signal: controller.signal,
+  })
+    .then((handle) => {
+      viewer = handle;
+    })
+    .catch((error) => {
+      if (!controller.signal.aborted)
+        console.error("Could not load the track", error);
+    });
+  window.addEventListener("pagehide", () => {
+    controller.abort();
+    viewer?.destroy();
+  });
 </script>
 ```
 
@@ -152,7 +160,7 @@ Report bugs or request features in [GitHub Issues](https://github.com/dutchdrone
 
 Try the [live viewer demo](https://viewer.trackdraw.app/) to explore what the package can do on a website. Events and layouts are illustrative samples.
 
-Explore the viewer locally with `npm run dev:demo`: a website showcase featuring the viewer as a hero, an event page with switchable race tracks and interactive obstacle previews. Open `/?mode=develop` for six live integration recipes, copyable HTML/JavaScript and downloadable sample tracks. Separate scenario tools at `/?mode=scenarios` provide deterministic scenes, live settings, viewer comparisons and local snapshot/archive imports. See [Demo development](CONTRIBUTING.md#demo) for setup and visual checks. The demo is separate from the published packages.
+Explore the viewer locally with `npm run dev:demo`: a website showcase featuring the viewer as a hero, an event page with switchable race tracks and interactive obstacle previews. Open `/develop` for six live integration recipes, copyable HTML/JavaScript and downloadable sample tracks. Separate scenario tools at `/scenarios` provide deterministic scenes, live settings, viewer comparisons and local snapshot/archive imports. See [Demo development](CONTRIBUTING.md#demo) for setup and visual checks. The demo is separate from the published packages.
 
 ## License
 

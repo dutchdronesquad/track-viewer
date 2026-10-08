@@ -60,7 +60,7 @@ export function Develop() {
         </a>
         <nav aria-label="Developer navigation">
           <a href="/">Showcase</a>
-          <a href="/?mode=scenarios">Scenario tools ↗</a>
+          <a href="/scenarios">Scenario tools ↗</a>
         </nav>
       </header>
       <main className="developer-main">
@@ -99,7 +99,7 @@ export function Develop() {
                   history.replaceState(
                     null,
                     "",
-                    `/?mode=develop&recipe=${recipe.id}`
+                    `/develop?recipe=${recipe.id}`
                   );
                 }}
               >
@@ -241,7 +241,8 @@ export function Develop() {
               </button>
             </div>
             <p className="code-note">
-              For an ESM project with a bundler. Save{" "}
+              For an ESM project with a bundler. This uses the development API;
+              mountTrack will be available in the next npm release. Save{" "}
               {selected.id === "controls" ? (
                 "both downloaded snapshots"
               ) : (
@@ -261,28 +262,51 @@ export function Develop() {
             <p role="status" className="copy-status">
               {copied}
             </p>
+            <details>
+              <summary>Loading errors and component cleanup</summary>
+              <p>
+                mountTrack rejects failed downloads, invalid tracks and
+                unsupported viewer requirements. Show an error in your own page.
+                Cancel loading if your component unmounts before the viewer is
+                ready.
+              </p>
+              <pre>
+                <code>{`const controller = new AbortController();
+let viewer;
+try {
+  viewer = await mountTrack("#track", {
+    source: "./track.snapshot.json",
+    signal: controller.signal,
+  });
+} catch (error) {
+  if (!controller.signal.aborted) {
+    document.querySelector("#status").textContent = "Could not load the track";
+  }
+}
+
+// Run from your component's cleanup hook, including while loading:
+// controller.abort();
+// viewer?.destroy();`}</code>
+              </pre>
+            </details>
             <div className="recipe-next">
               <h3>Bring your own track</h3>
               <p>
                 Export a viewer snapshot or .tdviewer.zip from TrackDraw. Use
-                the <a href="/?mode=scenarios">scenario tools</a> to check it
-                locally before integrating. Keep API credentials on your server.
+                the <a href="/scenarios">scenario tools</a> to check it locally
+                before integrating. Keep API credentials on your server.
               </p>
               <details>
                 <summary>Load an offline archive</summary>
                 <pre>
-                  <code>{`import { readViewerArchive, createViewerArchiveAssets, assertViewerSnapshotSupported } from "@trackdraw/viewer";
+                  <code>{`// The same viewer can load a hosted archive:
+await viewer.setSource("./track.tdviewer.zip");
 
-const response = await fetch("./track.tdviewer.zip");
-if (!response.ok) throw new Error("Could not load the archive");
-const archive = readViewerArchive(new Uint8Array(await response.arrayBuffer()));
-assertViewerSnapshotSupported(archive.snapshot);
-const assets = createViewerArchiveAssets(archive);
-viewer.update({ design: archive.snapshot.design, assetResolver: assets.assetResolver });
+// Or a File from an <input type="file">:
+await viewer.setSource(file);
 
-// When removing the viewer, release it before its texture URLs:
-// viewer.destroy();
-// assets.dispose();`}</code>
+// destroy() also releases the archive's texture URLs.
+// viewer.destroy();`}</code>
                 </pre>
               </details>
             </div>

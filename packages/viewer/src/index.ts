@@ -1,3 +1,9 @@
+export {
+  mountTrack,
+  type MountedTrack,
+  type MountTrackOptions,
+  type TrackSource,
+} from "./mount-track";
 export type {
   TrackDrawViewerOptions,
   ViewerView,

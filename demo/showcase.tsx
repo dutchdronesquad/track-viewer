@@ -132,7 +132,7 @@ export function Showcase() {
           <span className="demo-badge">Demo</span>
           <a href="#track">The track</a>
           <a href="#details">The details</a>
-          <a href="/?mode=develop">Develop ↗</a>
+          <a href="/develop">Developers</a>
         </nav>
       </header>
       <main>
@@ -230,10 +230,7 @@ export function Showcase() {
               </div>
             </div>
             <p className="track-note">{eventTrack.note}</p>
-            <a
-              className="integration-link"
-              href="/?mode=develop&recipe=controls"
-            >
+            <a className="integration-link" href="/develop?recipe=controls">
               Build this integration <span aria-hidden="true">↗</span>
             </a>
           </div>
@@ -380,7 +377,7 @@ export function Showcase() {
             </span>
             <span>2D + 3D · ONE TRACK</span>
           </div>
-          <a className="integration-link" href="/?mode=develop&recipe=briefing">
+          <a className="integration-link" href="/develop?recipe=briefing">
             Build a pilot briefing <span aria-hidden="true">↗</span>
           </a>
         </section>
@@ -450,7 +447,7 @@ export function Showcase() {
               </article>
             ))}
           </div>
-          <a className="integration-link" href="/?mode=develop&recipe=product">
+          <a className="integration-link" href="/develop?recipe=product">
             Build an obstacle catalog <span aria-hidden="true">↗</span>
           </a>
         </section>

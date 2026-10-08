@@ -26,8 +26,7 @@ describe("developer integration recipes", () => {
         transform(code, { loader: "js", target: "es2022" })
       ).resolves.toHaveProperty("code");
       expect(code).toContain("@trackdraw/viewer/static/trackdraw-viewer.css");
-      expect(code).toContain("validateViewerDesignSnapshot");
-      expect(code).toContain("assertViewerSnapshotSupported");
+      expect(code).toContain("mountTrack");
       expect(code).toContain("viewer.destroy()");
       const { forceWebglUnsupported: _forced, ...options } = recipe.options;
       for (const [key, value] of Object.entries(options)) {
@@ -49,7 +48,7 @@ describe("developer integration recipes", () => {
   it("starts copied track-switching code with the currently previewed layout", () => {
     const recipe = recipes.find((recipe) => recipe.id === "controls")!;
     expect(recipeCode(recipe, recipe.options, "final.snapshot.json")).toContain(
-      'fetch("./final.snapshot.json")'
+      'source: "./final.snapshot.json"'
     );
   });
 });
