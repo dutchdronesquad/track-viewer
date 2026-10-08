@@ -11,6 +11,7 @@ import {
 } from "../packages/viewer/src/lib/track/elements/catalog";
 import { scenarios } from "./scenarios";
 import { Preview } from "./preview";
+import { DemoNavigation } from "./navigation";
 import "./showcase.css";
 import logoDark from "./assets/trackdraw-logo-color-darkbg.svg";
 import logoLight from "./assets/trackdraw-logo-color-lightbg.svg";
@@ -128,19 +129,20 @@ export function Showcase() {
         <a href="/" className="showcase-brand">
           <img src={logoDark} alt="TrackDraw" width={180} height={35} />
         </a>
-        <nav aria-label="Showcase">
-          <span className="demo-badge">Demo</span>
-          <a href="#track">The track</a>
-          <a href="#details">The details</a>
-          <a href="/develop">Developers</a>
-          <a
-            href="https://github.com/dutchdronesquad/track-viewer"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            GitHub ↗
-          </a>
-        </nav>
+        <DemoNavigation
+          label="Showcase"
+          badge={<span className="demo-badge">Demo</span>}
+          links={[
+            { href: "#track", label: "The track" },
+            { href: "#details", label: "The details" },
+            { href: "/develop", label: "Developers" },
+            {
+              href: "https://github.com/dutchdronesquad/track-viewer",
+              label: "GitHub ↗",
+              external: true,
+            },
+          ]}
+        />
       </header>
       <main>
         <section className="showcase-hero" aria-labelledby="hero-title">
