@@ -25,6 +25,10 @@ await copyFile(
   path.join(root, "packages/viewer/dist/static/trackdraw-viewer.css"),
   path.join(output, "viewer.css")
 );
+await copyFile(
+  path.join(root, "demo/assets/favicon.ico"),
+  path.join(output, "favicon.ico")
+);
 const clients = new Set();
 const options = {
   absWorkingDir: root,
@@ -95,6 +99,7 @@ const server = createServer(async (req, res) => {
           ".html": "text/html",
           ".js": "text/javascript",
           ".css": "text/css",
+          ".ico": "image/x-icon",
           ".map": "application/json",
         }[path.extname(file)] ?? "application/octet-stream",
       "Cache-Control": "no-store",
