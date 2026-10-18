@@ -36,6 +36,7 @@ const options = {
   bundle: true,
   loader: { ".svg": "dataurl" },
   splitting: true,
+  chunkNames: "assets/[name]-[hash]",
   format: "esm",
   outdir: output,
   sourcemap: !building,
