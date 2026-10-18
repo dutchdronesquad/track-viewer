@@ -2,3 +2,8 @@
   Cache-Control: no-cache
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
+
+# Only content-hashed chunks are immutable; HTML and entry points revalidate.
+/assets/*
+  ! Cache-Control
+  Cache-Control: public, max-age=31536000, immutable
