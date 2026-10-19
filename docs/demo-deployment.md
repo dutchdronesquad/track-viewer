@@ -14,7 +14,7 @@ Run `npm run preview:demo` to build and serve through Wrangler's local Static As
 
 The dedicated Worker is `track-viewer-demo`, configured in `wrangler.demo.jsonc`. It has only static assets: no database, storage binding, API credentials in the browser or server-side code. Catalog artwork is requested from the public asset service. Imported tracks remain local to the user's browser.
 
-Authenticate Wrangler with the intended Cloudflare account and run `npm run deploy:demo`. With multiple accounts, explicitly set `CLOUDFLARE_ACCOUNT_ID`. The demo is served at `https://viewer.trackdraw.app/`, configured as a Worker Custom Domain in `wrangler.demo.jsonc`. Verify that hostname after deployment; the automatically assigned `workers.dev` URL is not the primary demo address.
+Authenticate Wrangler with the intended Cloudflare account and run `npm run deploy:demo`. With multiple accounts, explicitly set `CLOUDFLARE_ACCOUNT_ID`. The demo is served at `https://viewer.trackdraw.app/`, configured as a Worker Custom Domain in `wrangler.demo.jsonc`. Both `workers_dev` and `preview_urls` are explicitly disabled so deployments keep the production and version-specific `workers.dev` URLs disabled. Verify the custom hostname after deployment; disabling these URLs only in the Cloudflare dashboard does not persist if Wrangler configuration enables them again.
 
 After publishing, verify the demo identity, qualifying/final switching, 2D/3D controls, developer snippets, sample downloads, catalog textures, fallback, narrow layout and response headers. Check real touch-device interaction separately before declaring touch acceptance.
 
