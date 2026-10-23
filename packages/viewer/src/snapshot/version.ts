@@ -21,6 +21,7 @@ export const RENDERER_CAPABILITIES = [
   "shape:polyline",
   "shape:startfinish",
   "shape:ladder",
+  "shape:ladder:thickness",
   "shape:divegate",
   "shape:barrier",
   "catalog:trackdraw",
