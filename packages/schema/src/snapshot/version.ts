@@ -14,6 +14,8 @@ export function getRequiredViewer(
   const capabilities = new Set<string>();
   for (const shape of shapes) {
     capabilities.add(`shape:${shape.kind}`);
+    if (shape.kind === "ladder" && shape.thick !== undefined)
+      capabilities.add("shape:ladder:thickness");
     if (shape.appearance?.source === "registry")
       capabilities.add(
         `appearance:${shape.appearance.source}:${shape.appearance.templateId}`

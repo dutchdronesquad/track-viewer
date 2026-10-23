@@ -72,6 +72,7 @@ export const viewerShapeSchema = z.discriminatedUnion("kind", [
     width: dimension,
     height: dimension,
     rungs: z.number().int().min(1).max(100),
+    thick: dimension.optional(),
     elevation: coordinate.optional(),
   }),
   z.object({
