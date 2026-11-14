@@ -9,6 +9,7 @@
 "use client";
 
 import { OrbitControls } from "@react-three/drei";
+import { FlagMotion } from "./flag-motion";
 import { Canvas, useThree, useFrame } from "@react-three/fiber";
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 import {
@@ -214,7 +215,7 @@ const TrackViewer3D = forwardRef<TrackViewer3DHandle, TrackViewer3DProps>(
           <group ref={sceneRef}>
             <TrackSurface3D field={field} theme={t} bounded={presentation} />
 
-            {shapeNodes}
+            <FlagMotion playing={active}>{shapeNodes}</FlagMotion>
 
             <FieldWatermark
               fw={field.width}
